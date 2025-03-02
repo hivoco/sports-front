@@ -5,22 +5,18 @@ import React, { useEffect, useState } from "react";
 
 const LandingDisplay = () => {
   const [animation, setAnimation] = useState(false);
-  const router =useRouter()
+  const router = useRouter();
   useEffect(() => {
     const timer = setTimeout(() => {
       setAnimation(true);
     }, 2000);
   }, []);
 
-
-
   useEffect(() => {
     setTimeout(() => {
       router.push("/splash-screen");
     }, 3000);
   }, []);
-
-  
 
   return (
     <div
