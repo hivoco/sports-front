@@ -5,6 +5,7 @@ import React from "react";
 const SplashScreen = () => {
   return (
     <div className="px-6 pt-7 pb-8 flex flex-col justify-between h-full">
+      
       <nav className=" flex justify-between w-full">
         <Image
           src="/images/s-icon.png"

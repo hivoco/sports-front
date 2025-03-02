@@ -20,7 +20,7 @@ const LandingDisplay = () => {
 
   return (
     <div
-      className={` flex  h-svh justify-center items-center gap-3
+      className={` flex  h-full justify-center items-center gap-3
       ${animation ? "flex-row" : "flex-col"}
      `}
     >
