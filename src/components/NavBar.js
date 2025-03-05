@@ -12,7 +12,7 @@ const NavBar = () => {
       />
 
       <Image
-        src="/images/hv-circle.png"
+        src="/images/hv-circle-white.png"
         width={40}
         height={38}
         alt="hivoco circular logo"

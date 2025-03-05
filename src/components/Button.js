@@ -1,10 +1,11 @@
 import { ChevronRight } from "lucide-react";
 
-const Button = ({title,displayIcon}) => {
+const Button = ({ title, displayIcon, className }) => {
   return (
     <button
-      className="flex h-14 relative justify-center  items-center font-Inter bg-white/25 font-semibold text-[20px] leading-6 text-center border border-white text-white w-full
-      rounded-full"
+      className={`flex h-14 relative justify-center  items-center font-Inter bg-white/25 font-semibold text-[20px] leading-6 text-center border border-white text-white w-full
+      rounded-full 
+      ${className}`}
     >
       <span className="">{title}</span>
 

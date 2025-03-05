@@ -18,9 +18,23 @@
 }
 
 body {
+   color: #fff;
   /* overflow:hidden; */
 
   /* color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif; */
+}
+
+
+@font-face {
+  font-family: 'Theo Van';
+  src: url('/fonts/theo-van.TTF') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  --font-Theo: "Theo Van", "sans-serif";
 }
