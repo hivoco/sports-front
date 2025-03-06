@@ -173,6 +173,7 @@ export default function Quiz() {
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
   const [correctOption, setCorrectOption] = useState(null);
+  const [audio, setAudio] = useState(null);
   const searchParams = useSearchParams();
 
   const language = searchParams.get("language") || "english";
@@ -180,6 +181,32 @@ export default function Quiz() {
   useEffect(() => {
     fetchQuestions();
   }, [language]);
+
+  //  useEffect(() => {
+  //    if (questions.length > 0) {
+  //      playQuestionAudio();
+  //    }
+  //  }, [currentQuestionIndex, questions]);
+
+  const playQuestionAudio = () => {
+    if (audio) {
+      audio.pause(); // Stop previous audio if playing
+    }
+
+    const questionAudio = new Audio(
+      `data:audio/wav;base64,${questions[currentQuestionIndex].audio}`
+    );
+    questionAudio
+      .play()
+      .catch((error) => console.error("Audio play error:", error));
+
+    setAudio(questionAudio);
+
+    questionAudio.onended = () => {
+      console.log("Audio ended, starting mic...");
+      handleStartRecording();
+    };
+  };
 
   const fetchQuestions = async () => {
     try {
@@ -237,6 +264,7 @@ export default function Quiz() {
       platform: "",
       option_one: questions[currentQuestionIndex].options[0],
     };
+    if (selectedOption) return;
     try {
       const response = await fetch(
         "https://node.hivoco.com/api/verify_answer",
@@ -260,7 +288,7 @@ export default function Quiz() {
   };
 
   const handleOptionClick = (option) => {
-     if (recording || selectedOption) return;
+    if (recording || selectedOption) return;
     setSelectedOption(option);
     verifyAnswer(option, true);
   };
@@ -298,7 +326,7 @@ export default function Quiz() {
 
       let speechDetected = false;
       let transcriptText = ""; // Store recognized speech
-
+      console.log("yha tak");
       recognition.onresult = async (event) => {
         speechDetected = true; // Speech was detected
         transcriptText = event.results[0][0].transcript; // Extract speech text
@@ -370,6 +398,7 @@ export default function Quiz() {
             priority
           />
           <Image
+            onClick={playQuestionAudio}
             src="/svg/Mute.svg"
             width={34}
             height={34}
@@ -415,6 +444,15 @@ export default function Quiz() {
            >
              {recording ? "Stop" : "🎤"}
            </button> */}
+
+            {/* <audio
+              src={`data:audio/wav;base64,${currentQuestion.audio}`}
+              controls
+              onEnded={() =>
+                recording ? handleStopRecording : handleStartRecording
+              }
+              className="w-full "
+            /> */}
 
             <div className="flex flex-col gap-2 self-stretch">
               {currentQuestion.options.map((option, index) => (
