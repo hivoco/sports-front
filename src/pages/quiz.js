@@ -164,11 +164,19 @@ import { X } from "lucide-react";
 import Link from "next/link";
 import Loading from "./loading";
 import { useSearchParams } from "next/navigation";
+import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 
 export default function Quiz() {
+  const {
+    recording,
+    speechText,
+    startSpeechRecognition,
+    stopSpeechRecognition,
+  } = useSpeechRecognition();
+
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [recording, setRecording] = useState(false);
+  // const [recording, setRecording] = useState(false);
   const [mediaRecorder, setMediaRecorder] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
@@ -180,14 +188,13 @@ export default function Quiz() {
 
   useEffect(() => {
     fetchQuestions();
-    handleStartRecording();
   }, [language]);
 
-  //  useEffect(() => {
-  //    if (questions.length > 0) {
-  //      playQuestionAudio();
-  //    }
-  //  }, [currentQuestionIndex, questions]);
+  useEffect(() => {
+    if (speechText) {
+      verifyAnswer(speechText);
+    }
+  }, [speechText]);
 
   const playQuestionAudio = () => {
     if (audio) {
@@ -295,77 +302,80 @@ export default function Quiz() {
   };
 
   const handleStartRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const recorder = new MediaRecorder(stream);
-      setMediaRecorder(recorder);
-      const chunks = [];
+    startSpeechRecognition();
+    // try {
+    //   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    //   const recorder = new MediaRecorder(stream);
+    //   setMediaRecorder(recorder);
+    //   const chunks = [];
 
-      recorder.ondataavailable = (event) => chunks.push(event.data);
+    //   recorder.ondataavailable = (event) => chunks.push(event.data);
 
-      recorder.onstop = async () => {};
+    //   recorder.onstop = async () => {
+    //     // No need to process audio anymore
+    //   };
 
-      recorder.start();
-      setRecording(true);
+    //   recorder.start();
+    //   setRecording(true);
 
-      // Speech Recognition to detect speech
-      const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition ||
-        window.mozSpeechRecognition ||
-        window.msSpeechRecognition;
-      if (!SpeechRecognition) {
-        console.error("SpeechRecognition not supported");
-        recorder.stop();
-        setRecording(false);
-        return;
-      }
+    //   // Speech Recognition to detect speech
+    //   const SpeechRecognition =
+    //     window.SpeechRecognition ||
+    //     window.webkitSpeechRecognition ||
+    //     window.mozSpeechRecognition ||
+    //     window.msSpeechRecognition;
+    //   if (!SpeechRecognition) {
+    //     console.error("SpeechRecognition not supported");
+    //     recorder.stop();
+    //     setRecording(false);
+    //     return;
+    //   }
 
-      const recognition = new SpeechRecognition();
+    //   const recognition = new SpeechRecognition();
 
-      recognition.onerror = (event) => {
-        console.error("Speech recognition error:", event.error);
-      };
+    //   recognition.onerror = (event) => {
+    //     console.error("Speech recognition error:", event.error);
+    //   };
 
-      recognition.onaudiostart = () => console.log("Audio started");
-      recognition.onaudioend = () => console.log("Audio ended");
-      recognition.onspeechstart = () => console.log("Speech detected");
-      recognition.onspeechend = () => console.log("Speech ended");
+    //   recognition.onaudiostart = () => console.log("Audio started");
+    //   recognition.onaudioend = () => console.log("Audio ended");
+    //   recognition.onspeechstart = () => console.log("Speech detected");
+    //   recognition.onspeechend = () => console.log("Speech ended");
 
-      recognition.continuous = false; // Stops when speech ends
-      recognition.interimResults = false;
-      recognition.lang = "en-US"; // Set language if needed
+    //   recognition.continuous = false; // Stops when speech ends
+    //   recognition.interimResults = false;
+    //   recognition.lang = "en-US"; // Set language if needed
 
-      let speechDetected = false;
-      let transcriptText = ""; // Store recognized speech
+    //   let speechDetected = false;
+    //   // let transcriptText = ""; // Store recognized speech
+    //   console.log("yha tak");
+    //   recognition.onresult = async (event) => {
+    //     speechDetected = true; // Speech was detected
+    //     transcriptText = event.results[0][0].transcript; // Extract speech text
+    //     console.log("User said:", transcriptText);
 
-      recognition.onresult = async (event) => {
-        speechDetected = true; // Speech was detected
-        transcriptText = event.results[0][0].transcript; // Extract speech text
-        console.log("User said:", transcriptText);
+    //     // Call API with text instead of audio
+    //     await verifyAnswer(transcriptText, false);
+    //   };
 
-        // Call API with text instead of audio
-        await verifyAnswer(transcriptText, false);
-      };
+    //   recognition.onend = () => {
+    //     if (speechDetected) {
+    //       console.log("Speech detected, API called with text.");
+    //     } else {
+    //       console.log("No speech detected.");
+    //     }
 
-      recognition.onend = () => {
-        if (speechDetected) {
-          console.log("Speech detected, API called with text.");
-        } else {
-          console.log("No speech detected.");
-        }
+    //     // Stop recording in both cases
+    //     if (recorder.state === "recording") {
+    //       recorder.stop();
+    //       setRecording(false);
+    //     }
+    //   };
 
-        // Stop recording in both cases
-        if (recorder.state === "recording") {
-          recorder.stop();
-          setRecording(false);
-        }
-      };
-
-      recognition.start();
-    } catch (error) {
-      console.error("Error starting recording:", error);
-    }
+    //   recognition.start();
+    // } catch (error) {
+    //   console.error("Error starting recording:", error);
+    // }
   };
 
   const handleStopRecording = () => {
