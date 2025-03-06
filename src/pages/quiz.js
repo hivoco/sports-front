@@ -294,7 +294,7 @@ export default function Quiz() {
   };
 
   const handleStartRecording = async () => {
-    console.log("dddf")
+    console.log("dddf");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
@@ -312,7 +312,10 @@ export default function Quiz() {
 
       // Speech Recognition to detect speech
       const SpeechRecognition =
-        window.SpeechRecognition || window.webkitSpeechRecognition;
+        window.SpeechRecognition ||
+        window.webkitSpeechRecognition ||
+        window.mozSpeechRecognition ||
+        window.msSpeechRecognition;
       if (!SpeechRecognition) {
         console.error("SpeechRecognition not supported");
         recorder.stop();
