@@ -321,7 +321,7 @@ export default function Quiz() {
 
       const recognition = new SpeechRecognition();
       recognition.continuous = false; // Stops when speech ends
-      recognition.interimResults = false;
+      recognition.interimResults = true;
       recognition.lang = "en-US"; // Set language if needed
 
       let speechDetected = false;
