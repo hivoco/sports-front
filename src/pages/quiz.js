@@ -158,8 +158,6 @@
 
 // export default Quiz;
 
-"use client";
-
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
@@ -182,6 +180,7 @@ export default function Quiz() {
 
   useEffect(() => {
     fetchQuestions();
+    handleStartRecording();
   }, [language]);
 
   //  useEffect(() => {
@@ -294,74 +293,6 @@ export default function Quiz() {
     setSelectedOption(option);
     verifyAnswer(option, true);
   };
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const SpeechRecognition =
-        window.SpeechRecognition ||
-        window.webkitSpeechRecognition ||
-        window.mozSpeechRecognition ||
-        window.msSpeechRecognition;
-
-      if (SpeechRecognition) {
-        const recognition = new SpeechRecognition();
-        recognition.continuous = false; // Stops when speech ends
-        recognition.interimResults = false;
-        recognition.lang = "en-US"; // Set language if needed
-
-        let speechDetected = false; // Flag to track if speech was detected
-
-        recognition.onresult = async (event) => {
-          speechDetected = true; // Speech was detected
-          const transcriptText = event.results[0][0].transcript; // Extract speech text
-          console.log("User said:", transcriptText);
-
-          // Call API with text instead of audio
-          await verifyAnswer(transcriptText, false);
-        };
-
-        recognition.onerror = (event) => {
-          console.error("Speech recognition error:", event.error);
-        };
-
-        recognition.onaudiostart = () => console.log("Audio started");
-        recognition.onaudioend = () => console.log("Audio ended");
-        recognition.onspeechstart = () => console.log("Speech detected");
-        recognition.onspeechend = () => console.log("Speech ended");
-
-        const handleStartRecording = () => {
-          try {
-            recognition.start();
-          } catch (error) {
-            console.error("Error starting recognition:", error);
-          }
-        };
-
-        const handleStopRecording = () => {
-          if (recognition) {
-            recognition.stop();
-            setRecording(false);
-          }
-        };
-
-        // Start recognition when needed, stop it when done
-        if (recording) {
-          handleStartRecording();
-        } else {
-          handleStopRecording();
-        }
-
-        // Cleanup on unmount or change
-        return () => {
-          if (recognition) {
-            recognition.stop();
-          }
-        };
-      } else {
-        console.error("SpeechRecognition not supported");
-      }
-    }
-  }, [recording]); // Re-run whenever 'recording' state changes
 
   const handleStartRecording = async () => {
     try {
