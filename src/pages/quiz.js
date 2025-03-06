@@ -294,6 +294,7 @@ export default function Quiz() {
   };
 
   const handleStartRecording = async () => {
+    console.log("dddf")
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const recorder = new MediaRecorder(stream);
