@@ -158,6 +158,8 @@
 
 // export default Quiz;
 
+"use client";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
@@ -292,8 +294,6 @@ export default function Quiz() {
     setSelectedOption(option);
     verifyAnswer(option, true);
   };
-
-  
 
   useEffect(() => {
     if (typeof window !== "undefined") {
