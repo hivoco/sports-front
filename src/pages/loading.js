@@ -4,12 +4,12 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 
 const Loading = () => {
-  const router =useRouter()
-  useEffect(() => {
-    setTimeout(() => {
-      router.push("/quiz");
-    }, 1500);
-  }, []);
+  // const router =useRouter()
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     router.push("/quiz");
+  //   }, 1500);
+  // }, []);
 
   return (
     <div

@@ -80,7 +80,10 @@ const LanguageSelection = () => {
       </div>
 
       {selectedOption && (
-        <Link href={"/loading"} className={"absolute bottom-10 w-full px-6"}>
+        <Link
+          href={`/quiz?language=${selectedOption}`}
+          className={"absolute bottom-10 w-full px-6"}
+        >
           <Button title={"Accept"} />
         </Link>
       )}
