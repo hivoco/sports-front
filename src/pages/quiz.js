@@ -179,12 +179,13 @@ export default function Quiz() {
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   // const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState(null);
+  // const [mediaRecorder, setMediaRecorder] = useState(null);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
   const [correctOption, setCorrectOption] = useState(null);
   const [audio, setAudio] = useState(null);
   const searchParams = useSearchParams();
+  const [userResponceArray, setUserResponceArray] = useState([]);
 
   const language = searchParams.get("language") || "english";
 
@@ -219,6 +220,7 @@ export default function Quiz() {
   };
 
   const fetchQuestions = async () => {
+    
     try {
       const response = await fetch(
         "https://node.hivoco.com/api/get_questions",
@@ -255,7 +257,9 @@ export default function Quiz() {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     } else {
-      window.location.href = "/login";
+      window.location.href = `/login?data=${encodeURIComponent(
+        JSON.stringify(userResponceArray)
+      )}`;
     }
   };
 
@@ -288,10 +292,43 @@ export default function Quiz() {
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
       if (data.is_correct && !bool) {
+        console.log("ha");
         setSelectedOption(data.correct_answer);
+        setUserResponceArray((prevArray) => [
+          ...prevArray,
+          {
+            question: questions?.[currentQuestionIndex]?.question,
+            givenAns: data.correct_answer,
+            correctAns: data.correct_answer,
+            isCorrect: data.is_correct,
+            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
+          },
+        ]);
       } else if (!data.is_correct && !bool) {
+        console.log("nhi");
         setSelectedOption(data.wrong_option);
+        setSelectedOption(data.correct_answer);
+        setUserResponceArray((prevArray) => [
+          ...prevArray,
+          {
+            question: questions?.[currentQuestionIndex]?.question,
+            givenAns: data.wrong_option,
+            correctAns: data.correct_answer,
+            isCorrect: data.is_correct,
+            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
+          },
+        ]);
       }
+      setUserResponceArray((prevArray) => [
+        ...prevArray,
+        {
+          question: questions?.[currentQuestionIndex]?.question,
+          givenAns: userAnswer,
+          correctAns: data.correct_answer,
+          isCorrect: data.is_correct,
+          time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
+        },
+      ]);
     } catch (error) {
       console.error("Error validating answer:", error);
     }
@@ -381,10 +418,11 @@ export default function Quiz() {
   };
 
   const handleStopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      setRecording(false);
-    }
+    return;
+    // if (mediaRecorder) {
+    //   mediaRecorder.stop();
+    //   setRecording(false);
+    // }
   };
 
   const currentQuestion = questions[currentQuestionIndex];
