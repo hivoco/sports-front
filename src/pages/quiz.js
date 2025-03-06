@@ -320,8 +320,18 @@ export default function Quiz() {
       }
 
       const recognition = new SpeechRecognition();
+
+      recognition.onerror = (event) => {
+        console.error("Speech recognition error:", event.error);
+      };
+
+      recognition.onaudiostart = () => console.log("Audio started");
+      recognition.onaudioend = () => console.log("Audio ended");
+      recognition.onspeechstart = () => console.log("Speech detected");
+      recognition.onspeechend = () => console.log("Speech ended");
+
       recognition.continuous = false; // Stops when speech ends
-      recognition.interimResults = true;
+      recognition.interimResults = false;
       recognition.lang = "en-US"; // Set language if needed
 
       let speechDetected = false;
