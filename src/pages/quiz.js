@@ -224,7 +224,7 @@ export default function Quiz() {
     const questionAudio = new Audio(
       `data:audio/wav;base64,${questions[currentQuestionIndex]?.audio}`
     );
-    setAllowAudio(true);
+
     questionAudio
       .play()
       .then(() => {
