@@ -333,7 +333,7 @@ export default function Quiz() {
         ]);
       } else if (!data.is_correct && !bool) {
         setSelectedOption(data.wrong_option);
-        setSelectedOption(data.correct_answer);
+
         setUserResponceArray((prevArray) => [
           ...prevArray,
           {
