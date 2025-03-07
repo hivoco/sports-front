@@ -1,10 +1,11 @@
-const LeaderBoard = () => {
-  const ranks = [
-    { rank: "2nd", name: "Vidhaan", points: 98 },
-    { rank: "3rd", name: "Shaurya", points: 98 },
-    { rank: "4th", name: "Aanya", points: 98 },
-    { rank: "5th", name: "Ayush", points: 98 },
-  ];
+const LeaderBoard = ({ ranks }) => {
+  console.log("ranks", ranks);
+  // const ranks = [
+  //   { rank: "2nd", name: "Vidhaan", points: 98 },
+  //   { rank: "3rd", name: "Shaurya", points: 98 },
+  //   { rank: "4th", name: "Aanya", points: 98 },
+  //   { rank: "5th", name: "Ayush", points: 98 },
+  // ];
 
   return (
     <div className="flex flex-1 flex-col items-center justify-between gap-1.5  h-2/5">
@@ -15,7 +16,7 @@ const LeaderBoard = () => {
         >
           <span>{entry.rank}</span>
           <span>{entry.name}</span>
-          <span>Pts. {entry.points}</span>
+          <span>Pts. {entry.rank}</span>
         </div>
       ))}
     </div>

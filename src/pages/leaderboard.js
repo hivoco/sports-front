@@ -2,14 +2,16 @@ import LeaderBoard from "@/components/LeaderBoard";
 import NavBar from "@/components/NavBar";
 import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const Leaderboard = () => {
   const router = useRouter();
-
+  const [leaderboard, setLeaderboard] = useState([]);
   useEffect(() => {
     if (router.query.phone) {
       postData(router.query.phone);
+    } else {
+      window.location.href = "/";
     }
   }, [router.query.phone]);
   const postData = async (phone) => {
@@ -31,10 +33,13 @@ const Leaderboard = () => {
       });
 
       const result = await response.json();
+      console.log("result", result.winner);
+      setLeaderboard(result.winner);
     } catch (error) {
       console.error("Error:", error);
     }
   };
+
   return (
     <div className="px-6 pt-7 pb-8 text-white flex flex-col  justify-between gap-4 h-full">
       <div className="flex flex-col gap-2.5  justify-between  h-3/5">
@@ -97,12 +102,12 @@ const Leaderboard = () => {
                 />
               </div>
               <p className="font-Inter font-semibold text-[18px] leading-6 text-center">
-                Kamakshi Garg
+                {leaderboard[0]?.name || "Name"}
               </p>
             </div>
 
             <span className="font-Inter font-extrabold text-[24px] leading-7 text-center">
-              98
+              {leaderboard[0]?.rank || "0"}
               <br />
               pts.
             </span>
@@ -110,7 +115,13 @@ const Leaderboard = () => {
         </div>
       </div>
 
-      <LeaderBoard />
+      <LeaderBoard
+        ranks={
+          leaderboard.length > 5
+            ? leaderboard?.slice(1, leaderboard.length - 1)
+            : leaderboard?.slice(1, leaderboard.length)
+        }
+      />
     </div>
   );
 };
