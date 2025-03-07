@@ -178,8 +178,8 @@ export default function Quiz() {
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  // const [recording, setRecording] = useState(false);
-  // const [mediaRecorder, setMediaRecorder] = useState(null);
+  const [allowAudio, setAllowAudio] = useState(true); // Controls whether audio should play
+  const [isPlaying, setIsPlaying] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
   const [correctOption, setCorrectOption] = useState(null);
@@ -199,28 +199,54 @@ export default function Quiz() {
     }
   }, [speechText]);
 
+  useEffect(() => {
+    if (allowAudio) {
+      playQuestionAudio();
+    }
+  }, [currentQuestionIndex]);
+
+  const toggleQuestionAudio = () => {
+    if (isPlaying) {
+      stopQuestionAudio();
+    } else {
+      playQuestionAudio();
+    }
+  };
+
   const playQuestionAudio = () => {
+    if (!allowAudio) return;
+
     if (audio) {
-      audio.pause(); // Stop previous audio if playing
+      audio.pause();
     }
 
     const questionAudio = new Audio(
-      `data:audio/wav;base64,${questions[currentQuestionIndex].audio}`
+      `data:audio/wav;base64,${questions[currentQuestionIndex]?.audio}`
     );
+
     questionAudio
       .play()
+      .then(() => {
+        setIsPlaying(true);
+        setAudio(questionAudio);
+      })
       .catch((error) => console.error("Audio play error:", error));
 
-    setAudio(questionAudio);
-
     questionAudio.onended = () => {
-      console.log("Audio ended, starting mic...");
+      setIsPlaying(false);
       handleStartRecording();
     };
   };
 
-  const fetchQuestions = async () => {
+  const stopQuestionAudio = () => {
+    if (audio) {
+      audio.pause();
+    }
+    setIsPlaying(false);
+    setAllowAudio(false); // Prevent auto-play on question change
+  };
 
+  const fetchQuestions = async () => {
     try {
       const response = await fetch(
         "https://node.hivoco.com/api/get_questions",
@@ -242,6 +268,8 @@ export default function Quiz() {
   const handleSkip = () => {
     if (currentQuestionIndex < questions.length - 1) {
       resetState();
+      setAllowAudio(true);
+      setIsPlaying(false);
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     }
   };
@@ -291,7 +319,6 @@ export default function Quiz() {
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
       if (data.is_correct && !bool) {
-       
         setSelectedOption(data.correct_answer);
         setUserResponceArray((prevArray) => [
           ...prevArray,
@@ -304,7 +331,6 @@ export default function Quiz() {
           },
         ]);
       } else if (!data.is_correct && !bool) {
-        
         setSelectedOption(data.wrong_option);
         setSelectedOption(data.correct_answer);
         setUserResponceArray((prevArray) => [
@@ -459,7 +485,7 @@ export default function Quiz() {
             priority
           />
           <Image
-            onClick={playQuestionAudio}
+            onClick={toggleQuestionAudio}
             src="/svg/Mute.svg"
             width={34}
             height={34}
