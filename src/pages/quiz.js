@@ -209,7 +209,6 @@ export default function Quiz() {
     if (isPlaying) {
       stopQuestionAudio();
     } else {
-      // setAllowAudio(true);
       playQuestionAudio();
     }
   };
@@ -220,7 +219,7 @@ export default function Quiz() {
     if (audio) {
       audio.pause();
     }
-
+    setAllowAudio(true);
     const questionAudio = new Audio(
       `data:audio/wav;base64,${questions[currentQuestionIndex]?.audio}`
     );
@@ -486,7 +485,7 @@ export default function Quiz() {
             priority
           />
           <Image
-            // onClick={toggleQuestionAudio}
+            onClick={toggleQuestionAudio}
             src="/svg/Mute.svg"
             width={34}
             height={34}
