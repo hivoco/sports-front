@@ -181,6 +181,7 @@ export default function Quiz() {
   const [allowAudio, setAllowAudio] = useState(false); // Controls whether audio should play
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
+  const [selectedOptionForIcon, setSelectedOptionForIcon] = useState(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
   const [correctOption, setCorrectOption] = useState(null);
   const [audio, setAudio] = useState(null);
@@ -234,6 +235,7 @@ export default function Quiz() {
 
     questionAudio.onended = () => {
       setIsPlaying(false);
+      if (selectedOption) return;
       handleStartRecording();
     };
   };
@@ -320,6 +322,7 @@ export default function Quiz() {
       setCorrectOption(data.correct_option);
       if (data.is_correct && !bool) {
         setSelectedOption(data.correct_answer);
+        setSelectedOptionForIcon(data.correct_answer);
         setUserResponceArray((prevArray) => [
           ...prevArray,
           {
@@ -330,9 +333,10 @@ export default function Quiz() {
             time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
           },
         ]);
+        return;
       } else if (!data.is_correct && !bool) {
         setSelectedOption(data.wrong_option);
-
+        setSelectedOptionForIcon(data.wrong_option);
         setUserResponceArray((prevArray) => [
           ...prevArray,
           {
@@ -343,17 +347,35 @@ export default function Quiz() {
             time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
           },
         ]);
+        return;
+      } else if (!data.is_correct && bool) {
+        
+        setSelectedOption(data.wrong_option);
+        setUserResponceArray((prevArray) => [
+          ...prevArray,
+          {
+            question: questions?.[currentQuestionIndex]?.question,
+            givenAns: userAnswer,
+            correctAns: data.correct_answer,
+            isCorrect: data.is_correct,
+            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
+          },
+        ]);
+        return;
+      } else if (data.is_correct && bool) {
+        setSelectedOption(data.correct_answer);
+        setUserResponceArray((prevArray) => [
+          ...prevArray,
+          {
+            question: questions?.[currentQuestionIndex]?.question,
+            givenAns: userAnswer,
+            correctAns: data.correct_answer,
+            isCorrect: data.is_correct,
+            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
+          },
+        ]);
+        return;
       }
-      setUserResponceArray((prevArray) => [
-        ...prevArray,
-        {
-          question: questions?.[currentQuestionIndex]?.question,
-          givenAns: userAnswer,
-          correctAns: data.correct_answer,
-          isCorrect: data.is_correct,
-          time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
-        },
-      ]);
     } catch (error) {
       console.error("Error validating answer:", error);
     }
@@ -361,7 +383,7 @@ export default function Quiz() {
 
   const handleOptionClick = (option) => {
     if (recording || selectedOption) return;
-    setSelectedOption(option);
+    setSelectedOptionForIcon(option);
     verifyAnswer(option, true);
   };
 
@@ -547,16 +569,18 @@ export default function Quiz() {
                   key={index}
                   onClick={() => handleOptionClick(option)}
                   className={`font-medium text-[16px] leading-5 text-center flex items-center justify-between border border-[#001734] px-6 py-3 rounded-full capitalize ${
-                    selectedOption === option
+                    selectedOption?.trim().toLowerCase() ===
+                    option?.trim().toLowerCase()
                       ? isAnswerCorrect
                         ? "border-green-500 bg-green-300"
-                        : "border-red-500"
+                        : "border-red-500 "
                       : ""
                   }`}
                 >
                   {option}
 
-                  {selectedOption === option && (
+                  {selectedOptionForIcon?.trim().toLowerCase() ===
+                    option?.trim().toLowerCase() && (
                     <Image
                       src="/svg/tick-circle.svg"
                       width={24}
