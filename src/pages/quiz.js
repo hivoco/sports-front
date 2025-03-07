@@ -349,7 +349,6 @@ export default function Quiz() {
         ]);
         return;
       } else if (!data.is_correct && bool) {
-        
         setSelectedOption(data.wrong_option);
         setUserResponceArray((prevArray) => [
           ...prevArray,
@@ -383,11 +382,17 @@ export default function Quiz() {
 
   const handleOptionClick = (option) => {
     if (recording || selectedOption) return;
+    if (audio) {
+      audio.pause();
+    }
     setSelectedOptionForIcon(option);
     verifyAnswer(option, true);
   };
 
   const handleStartRecording = async () => {
+    if (audio) {
+      audio.pause();
+    }
     startSpeechRecognition();
     // try {
     //   const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
