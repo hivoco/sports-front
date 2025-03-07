@@ -177,7 +177,7 @@ export default function IosQuiz() {
       question_id: questions[currentQuestionIndex].question_id,
       lang: language,
       onClick: bool,
-      platform: "",
+      platform: "iOS",
       option_one: questions[currentQuestionIndex].options[0],
     };
     if (selectedOption) return;
