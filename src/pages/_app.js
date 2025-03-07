@@ -11,7 +11,7 @@ export default function App({ Component, pageProps }) {
   
   return (
     <div
-      className={`h-svh bg-cover bg-center bg-no-repeat
+      className={`h-svh w-full bg-cover bg-center bg-no-repeat
         ${inter.className}`}
       style={{
         backgroundImage: `url(/bg/bg1.png)`,

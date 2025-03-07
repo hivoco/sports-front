@@ -1,46 +1,58 @@
-import Button from '@/components/Button'
-import NavBar from '@/components/NavBar'
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
+import Button from "@/components/Button";
+import NavBar from "@/components/NavBar";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
 
 const TermsAndConditions = () => {
-  
+  const [animationNumber, setAnimationNumber] = useState(0);
+  console.log(animationNumber, "animationNumber");
+  useEffect(() => {
+    const timer1 = setTimeout(() => {
+      setAnimationNumber(1);
+    }, 900);
+
+    const timer2 = setTimeout(() => {
+      setAnimationNumber(2);
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      // clearTimeout(timer3);
+    };
+  }, []);
+
   return (
-    <div className="relative text-white  pt-7 pb-8 h-full">
+    <div className="relative text-white  pt-7 pb-8 h-full overflow-hidden">
       <div className="px-6">
         <NavBar />
       </div>
 
       {/* top section */}
-      <div className="flex flex-col gap-3 items-center">
-        <div className="flex flex-col gap-1 items-center">
+      <div className="flex flex-col gap-1.5 items-center justify-center ">
           <p
             className="font-Inter w-fit font-light text-[12px] leading-[14px] text-center py-1 px-2
-      border border-white rounded-full
-      "
+            border border-white rounded-full"
           >
             Play the game & win a
           </p>
+
           <h2
             style={{
               textShadow: " -4.76px 2.38px 4.76px  #FFFFFF40",
             }}
-            className="font-Theo font-normal text-4xl leading-11 tracking-[0.08em] flex flex-col"
+            className={`font-Theo font-normal text-4xl leading-9 tracking-[0.06em] flex flex-col
+              transition-all duration-300 ease-in-out
+              ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
+              `}
           >
-            <span className="flex items-end gap-1.5">
-              meet
-              <Image
-                className="self-end"
-                src={"/svg/&.svg"}
-                width={34}
-                height={34}
-                alt="& text"
-              />
+            meet and
+            <br />
+            <span className="text-[44px] leading-11  tracking-[0.2em]">
+              greet
             </span>
-            greet
           </h2>
-        </div>
 
         <p
           className="font-Inter w-fit font-light text-[12px] leading-[14px] text-center py-1 px-2
@@ -55,32 +67,67 @@ const TermsAndConditions = () => {
         <div className="flex flex-col gap-8">
           <div className="flex flex-col items-center gap-5">
             <div className="flex flex-col gap-14 justify-center items-center">
-              <h1
-                style={{
-                  textShadow: "-3.79px 1.89px 3.79px #FFFFFF40",
-                }}
-                className="font-Theo  font-normal text-2xl leading-[30px]  
-                flex flex-col items-center
-                "
-              >
-                Real Madrid
+              <div className="flex flex-col gap-5 items-center relative">
+                <h1
+                  style={{
+                    textShadow: "-3.79px 1.89px 3.79px #FFFFFF40",
+                  }}
+                  className={`
+                  transition-all duration-700 ease-in-out
+                  font-Theo  font-normal text-[44px] leading-11 tracking-[0.1em]
+                  flex flex-col items-center
+                ${
+                  animationNumber >= 1 ? "translate-x-0" : "-translate-x-[200%]"
+                }
+                `}
+                >
+                  Real Madrid
+                </h1>
+
                 <Image
-                  className="-rotate-12"
+                  className={`absolute 
+                  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+                  transition-all duration-700 ease-in-out
+                  ${animationNumber >= 1 ? "scale-100" : "scale-0"}
+                  `}
                   src={"/svg/& (1).svg"}
                   width={45}
                   height={54}
                   alt="& text"
                 />
-                <span className="-mt-4">FC Barcelona </span>
-              </h1>
 
-              <p className="font-Inter font-normal text-[14px] leading-[17px] text-center">
+                <h1
+                  className={`
+                    transition-all duration-700 ease-in-out
+                    font-Theo  font-normal text-[44px] leading-11 tracking-[0.1em] 
+                             ${
+                               animationNumber >= 1
+                                 ? "translate-x-0"
+                                 : "translate-x-[200%]"
+                             }
+                    `}
+                >
+                  FC Barcelona
+                </h1>
+              </div>
+
+              <p
+                className={`font-Inter font-normal text-[14px] leading-[17px] text-center
+                          transition-all duration-700 ease-in-out
+                          ${animationNumber >= 2 ? "opacity-100" : "opacity-0"}
+                `}
+              >
                 By clicking ‘Accept’ you agree to the T&C of The Legend League
                 Quiz.
               </p>
             </div>
 
-            <div className="flex flex-col gap-1 justify-center items-center">
+            <div
+              className={`flex flex-col gap-1 justify-center items-center
+                transition-all duration-700 ease-in-out
+                ${animationNumber >= 2 ? "opacity-100" : "opacity-0"}
+              `}
+            >
               <h3 className="font-Inter text-[12px] font-bold leading-3.5 text-center">
                 Get tickets on
               </h3>
@@ -95,12 +142,23 @@ const TermsAndConditions = () => {
             </div>
           </div>
 
-          <h2 className="font-Inter font-medium text-[12px] leading-3.5 underline text-center">
+          <h2
+            className={`font-Inter font-medium text-[12px] leading-3.5 underline text-center
+              transition-all duration-700 ease-in-out
+              ${animationNumber >= 2 ? "opacity-100" : "opacity-0"}
+            `}
+          >
             Click here to view T&C
           </h2>
         </div>
 
-        <Link href={"/language-selection"}>
+        <Link
+          className={`
+            transition-all duration-700 ease-in-out
+            ${animationNumber >= 2 ? "opacity-100" : "opacity-0"}
+          `}
+          href={"/language-selection"}
+        >
           <Button title={"Accept"} displayIcon={false} />
         </Link>
       </div>
@@ -112,9 +170,10 @@ const TermsAndConditions = () => {
         height={404}
         src={"/images/Light element.png"}
         alt="light"
+        priority
       />
     </div>
   );
-}
+};
 
-export default TermsAndConditions
+export default TermsAndConditions;

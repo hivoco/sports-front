@@ -18,8 +18,7 @@
 }
 
 body {
-   color: #fff;
-  /* overflow:hidden; */
+  color: #fff; 
 
   /* color: var(--foreground);
   background: var(--background);
@@ -29,10 +28,10 @@ body {
 
 @font-face {
   font-family: 'Theo Van';
-  src: url('/fonts/theo-van.TTF') format('truetype');
+  src: url('/fonts/Evil Empire.otf') format('opentype');
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  /* font-display: swap; */
 }
 
 @theme {

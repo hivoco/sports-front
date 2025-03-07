@@ -6,7 +6,7 @@ import React, { useState } from "react";
 
 const LanguageSelection = () => {
   const [selectedOption, setSelectedOption] = useState("");
-  console.log(selectedOption);
+
 
   return (
     <div
@@ -18,7 +18,9 @@ const LanguageSelection = () => {
       </div>
 
       <div className="px-6 flex flex-col gap-y-6">
-        <h2 className="font-Inter font-bold text-3xl leading-9 text-center text-white">
+
+
+        <h2 className="font-Theo  font-normal text-[42px] leading-[38px] tracking-[0.02em] text-center text-white">
           Choose Language
         </h2>
 
@@ -33,55 +35,55 @@ const LanguageSelection = () => {
             setSelectedOption("english");
           }}
           className={`relative flex h-14 justify-center items-center font-Inter font-semibold text-[20px] leading-6 text-center border w-full
-        rounded-r-full
+        rounded-r-full transition-colors duration-500
         ${
           selectedOption === "english"
-            ? "border-[#001734] text-[#001734] bg-white"
+            ? "border-[#28211D] text-[#28211D] bg-white"
             : "bg-white/25  text-white"
         }
         `}
         >
           <Hexagon
-            className={`absolute -left-5 ${
+            className={`absolute -left-5 capitalize ${
               selectedOption === "english"
-                ? "bg-[#001734] text-white"
-                : "bg-white text-[#001734]"
+                ? "bg-[#28211D] text-white"
+                : "bg-white text-[#28211D]"
             }`}
             title={"A"}
           />
 
-          <span>english</span>
+          <span className="capitalize">english</span>
         </button>
 
         <button
           onClick={() => {
             setSelectedOption("hindi");
           }}
-          className={`relative flex h-14 justify-center items-center font-Inter font-semibold text-[20px] leading-6 text-center border   w-full
-        rounded-r-full
+          className={`relative capitalize flex h-14 justify-center items-center font-Inter font-semibold text-[20px] leading-6 text-center border   w-full
+        rounded-r-full transition-colors duration-500 
         ${
           selectedOption === "hindi"
-            ? "border-[#001734] text-[#001734] bg-white"
+            ? "border-[#28211D] text-[#28211D] bg-white"
             : "bg-white/25  text-white"
         }
         `}
         >
           <Hexagon
-            className={`absolute -left-5 ${
+            className={`absolute -left-5  ${
               selectedOption === "hindi"
-                ? "bg-[#001734] text-white"
-                : "bg-white text-[#001734]"
+                ? "bg-[#28211D] text-white"
+                : "bg-white text-[#28211D]"
             }`}
             title={"अ"}
           />
 
-          <span>hindi</span>
+          <span className="capitalize">hindi</span>
         </button>
       </div>
 
       {selectedOption && (
         <Link
-          href={`/quiz?language=${selectedOption}`}
+          href={`/platformQuiz?language=${selectedOption}`}
           className={"absolute bottom-10 w-full px-6"}
         >
           <Button title={"Accept"} />

@@ -43,16 +43,40 @@ const Login = () => {
       );
 
       const result = await response.json();
-      window.location.href=`/leaderboard?phone=${phone}`
+      window.location.href = `/leaderboard?phone=${phone}`;
     } catch (error) {
       console.error("Error:", error);
     }
   };
 
+  const [animationNumber, setAnimationNumber] = useState(0);
+  console.log(animationNumber, "animationNumber");
+
+  useEffect(() => {
+    const timer1 = setTimeout(() => {
+      setAnimationNumber(1);
+    }, 900);
+
+    const timer2 = setTimeout(() => {
+      setAnimationNumber(2);
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      // clearTimeout(timer3);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col gap-11 justify-center items-center h-full text-white">
       <div className="flex flex-col justify-center items-center gap-4">
-        <nav className="flex gap-1 items-center text-white">
+        <nav
+          className={`flex gap-1 items-center text-white
+            transition-all duration-500 ease-in-out
+            ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
+          `}
+        >
           <Image
             src="/images/s-icon.png"
             width={34}
@@ -77,29 +101,47 @@ const Login = () => {
           <div className="flex flex-col gap-2.5 justify-center items-center">
             <h2
               style={{ textShadow: "-4px 2px 4px #FFFFFF40" }}
-              className="font-Theo font-normal text-[40px] leading-[38px] tracking-[0.08em] text-center text-white"
+              className={`font-Theo font-normal text-[64px] leading-[38px] tracking-[0.08em] text-center text-white
+              transition-all duration-500 ease-in-out
+              ${animationNumber >= 1 ? "scale-100" : "scale-50"}
+                `}
             >
               LEGENDS
             </h2>
 
-            <h3 className="font-Inter font-medium text-[16px] leading-5 text-center tracking-[0.2em] text-white">
+            <h3
+              className={`font-Inter font-medium text-[16px] leading-5 text-center tracking-[0.2em] text-white
+                transition-all duration-500 ease-in-out
+                ${animationNumber >= 1 ? "translate-y-0" : "translate-y-1/2"}
+              `}
+            >
               FACE OFF
             </h3>
           </div>
-          <p className="font-Inter text-[18px] leading-[22px] text-center">
+          <p
+            className={`font-Inter text-[18px] leading-[22px] text-center
+            transition-all duration-500 ease-in-out
+            ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
+            `}
+          >
             SIGN UP TO VIEW RESULTS
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-16">
+      <div
+        className={`flex flex-col gap-16
+          transition-all duration-500 ease-in-out
+          ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
+        `}
+      >
         {/* inputs  */}
         <div className="flex flex-col gap-3">
           <input
-            autoComplete="name"
+            // autoComplete="name"
             type="text"
             inputMode="text"
-            name="full-name"
+            name="name"
             onChange={(e) => {
               setName(e.target.value);
             }}
@@ -107,18 +149,22 @@ const Login = () => {
             minLength={3}
             maxLength={10}
             placeholder="Full Name"
-            className={`flex py-4 font-Inter font-semibold text-[18px] leading-6 px-5 border border-white text-white w-full
+            className={`flex py-4 font-Inter font-medium text-[18px] leading-[18px] px-5 border border-white bg-white/25  text-white w-full
           rounded-full placeholder:text-white/50 outline-none`}
           />
 
-          <div className="flex items-center py-4 font-Inter  font-semibold text-[18px] leading-6 px-5 border border-white text-white w-full  rounded-full">
+          <div className={`flex items-center py-4 font-Inter  font-medium text-[18px] leading-[18px] px-5 border border-white bg-white/25 text-white w-full  rounded-full
+            `}>
             <span>+91</span>
             <input
               type="tel"
+              autocomplete="off"
+
               placeholder="Phone number"
               maxLength={10}
-              autoComplete="phone number"
-              className="w-full outline-none pl-2.5"
+              // autoComplete="tel"
+              className={`w-full outline-none pl-2.5 placeholder:text-white/50
+                `}
               inputMode="numeric"
               name="number"
               minLength={10}

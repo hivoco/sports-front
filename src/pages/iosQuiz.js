@@ -5,16 +5,13 @@ import { X } from "lucide-react";
 import Link from "next/link";
 import Loading from "./loading";
 import { useSearchParams } from "next/navigation";
-import useSpeechRecognition from "@/hooks/useSpeechRecognition";
+import { useRecordVoice } from "@/hooks/useRecordVoice";
+import { blobToBase64 } from "@/components/helper";
 import VerifyLoading from "@/components/VerifyLoading";
 
-export default function Quiz() {
-  const {
-    recording,
-    speechText,
-    startSpeechRecognition,
-    stopSpeechRecognition,
-  } = useSpeechRecognition();
+export default function IosQuiz() {
+    const { recordingAudio, recording, startRecording, stopRecording } =
+      useRecordVoice();
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -28,9 +25,8 @@ export default function Quiz() {
   const searchParams = useSearchParams();
   const [userResponceArray, setUserResponceArray] = useState([]);
   const [animationNumber, setAnimationNumber] = useState(0);
-  const [isLoading,setIsLoading] =useState(false)
-  console.log(animationNumber, "animationNumber");
-      
+  const [isLoading,setIsLoading] =useState(false)      
+
   
     useEffect(() => {
       const timer1 = setTimeout(() => {
@@ -38,7 +34,7 @@ export default function Quiz() {
       }, 1500);
 
       const timer2 = setTimeout(() => {
-        setAnimationNumber(2);
+        // setAnimationNumber(2);
       }, 1500);
 
       return () => {
@@ -48,6 +44,22 @@ export default function Quiz() {
       };
     }, []);
 
+    
+      const handleRecordingComplete = async (recordingAudio) => {
+        try {
+          const base64Audio = await blobToBase64(recordingAudio); // Convert blob to base64
+          verifyAnswer(base64Audio, false);
+        } catch (err) {
+          console.error("Error processing the recording blob", err);
+        }
+      };
+    
+      useEffect(() => {
+        if (recordingAudio) {
+          handleRecordingComplete(recordingAudio);
+        }
+      }, [recordingAudio]);
+
 
   const language = searchParams.get("language") || "english";
 
@@ -55,11 +67,11 @@ export default function Quiz() {
     fetchQuestions();
   }, [language]);
 
-  useEffect(() => {
-    if (speechText) {
-      verifyAnswer(speechText);
-    }
-  }, [speechText]);
+//   useEffect(() => {
+//     if (speechText) {
+//       verifyAnswer(speechText);
+//     }
+//   }, [speechText]);
 
   useEffect(() => {
     if (allowAudio) {
@@ -237,9 +249,7 @@ export default function Quiz() {
           },
         ]);
         return;
-
       }
-
     } catch (error) {
       setIsLoading(false)
       console.error("Error validating answer:", error);
@@ -259,9 +269,12 @@ export default function Quiz() {
     if (audio) {
       audio.pause();
     }
-    startSpeechRecognition();
-  };
+    startRecording();
 
+    setTimeout(() => {
+      stopRecording();
+    }, 4000); // Stops recording after 4 seconds
+  };
   const handleStopRecording = () => {
     return;
   };
@@ -365,7 +378,7 @@ export default function Quiz() {
           <div className="flex flex-col gap-3 w-full -rotate-3">
             <div className="relative self-center">
               <Image
-                onClick={recording ? handleStopRecording : handleStartRecording}
+                onClick={ handleStartRecording}
                 className={`self-center
                   transition-all duration-300 ease-in-out
                   ${animationNumber >= 1 ? "scale-100" : "scale-75"}
@@ -450,8 +463,9 @@ export default function Quiz() {
         >
           Submit
         </button>
-      </div>
 
+        
+      </div>
       {isLoading && <VerifyLoading />}
     </div>
   );

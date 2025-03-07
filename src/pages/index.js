@@ -4,86 +4,90 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 const LandingDisplay = () => {
-  const [animation, setAnimation] = useState(false);
+  const [animationNumber, setAnimationNumber] = useState(0);
+  console.log(animationNumber,"animationNumber");
+  
   const router = useRouter();
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimation(true);
-    }, 2000);
+    const timer1 = setTimeout(() => {
+      setAnimationNumber(1);
+    }, 900);
+
+    const timer2 = setTimeout(() => {
+      setAnimationNumber(2);
+    }, 5200);
+
+    const timer3 = setTimeout(() => {
+      setAnimationNumber(3);
+    }, 8000);
+
+
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+
+    };
   }, []);
 
   useEffect(() => {
+    const timer = 
     setTimeout(() => {
       router.push("/splash-screen");
-    }, 3000);
+    }, 9500);
+
+    return ()=>{
+      clearTimeout(timer)
+    }
   }, []);
 
   return (
     <div
-      className={` flex  h-full justify-end items-center gap-3 text-white
-      ${animation ? "flex-row px-6" : "flex-col pb-20"}
+      className={`fixed h-full w-full  flex  gap-2.5 items-center  justify-center text-white
      `}
     >
-      <div className="flex flex-col gap-40">
-        <div className="flex flex-col items-center gap-3">
-          <Image
-            src={"/images/sports-front logo.png"}
-            width="135"
-            height="72"
-            alt="sports front logo"
-            priority
-          />
+      <Image
+        className={`transition-all duration-700 ease-in-out 
+        ${animationNumber === 2 ? "translate-0" : "-translate-x-[150%]"}
+        `}
+        src={"/images/sports-front logo.png"}
+        width="136"
+        height="72"
+        alt="sports front logo"
+        priority
+      />
 
-          {!animation && (
-            <>
-              <h2
-                style={{ textShadow: "-4px 2px 4px #FFFFFF40" }}
-                className="font-Theo font-normal text-[40px] leading-[38px] tracking-[0.08em] text-center"
-              >
-                LEGENDS
-              </h2>
-              <p className="font-Inter font-medium text-[16px] leading-5 tracking-[0.22em] text-center">
-                FACE OFF
-              </p>
-            </>
-          )}
-        </div>
+      <X
+        size={34}
+        color="white"
+        className={`transition-opacity duration-700 ease-in-out
+        ${animationNumber === 2 ? "opacity-100" : "opacity-0"} `}
+      />
 
-        {!animation && (
-          <div className=" flex flex-col gap-1.5 items-center justify-center">
-            <h4 className="font-Inter font-extrabold text-[20px] leading-6 -tracking-wide text-center">
-              6th APRIL 2025
-            </h4>
+      <Image
+        className={`transition-all duration-700 ease-in-out w-[136px] h-auto 
+          ${animationNumber === 2 ? "translate-0" : "translate-x-[150%] "}
+        `}
+        src={"/images/White hollow logo.png"}
+        height={136}
+        width={81}
+        alt={"hivoco logo"}
+        priority
+      />
 
-            <p className="font-Inter font-semibold text-[12px] leading-3.5 tracking-[0.24em] text-center">
-              DY PATIL STADIUM, MUMBAI
-            </p>
-          </div>
-        )}
-      </div>
+      {/* absolute, out of layout  */}
+      {/* first screen image full bg */}
 
-      {animation && (
-        <>
-          <X
-            size={34}
-            className={`text-white
-                    transition-opacity 
-          duration-1000 
-          ease-in-out
-          ${animation ? "opacity-100" : "opacity-0"}
-
+      <Image
+        className={`absolute  h-full object-cover transition-opacity duration-[1500ms] ease-in-out
+          ${animationNumber === 1 ? "opacity-100 " : "opacity-0"}
           `}
-          />
-
-          <Image
-            src={"/images/White hollow logo.png"}
-            width={135}
-            height={81}
-            alt={"hivoco logo"}
-            priority
-          />
-        </>
-      )}
+        src="/images/first-screen-BG.png"
+        width={"375"}
+        height={"667"}
+        alt="first screen BG"
+        priority
+      />
     </div>
   );
 };
