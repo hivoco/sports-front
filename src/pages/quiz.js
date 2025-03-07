@@ -178,7 +178,7 @@ export default function Quiz() {
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [allowAudio, setAllowAudio] = useState(true); // Controls whether audio should play
+  const [allowAudio, setAllowAudio] = useState(false); // Controls whether audio should play
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
@@ -209,12 +209,13 @@ export default function Quiz() {
     if (isPlaying) {
       stopQuestionAudio();
     } else {
+      setAllowAudio(true);
       playQuestionAudio();
     }
   };
 
   const playQuestionAudio = () => {
-    if (!allowAudio) return;
+    // if (!allowAudio) return;
 
     if (audio) {
       audio.pause();
@@ -268,7 +269,7 @@ export default function Quiz() {
   const handleSkip = () => {
     if (currentQuestionIndex < questions.length - 1) {
       resetState();
-      setAllowAudio(true);
+      // setAllowAudio(true);
       setIsPlaying(false);
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     }
