@@ -1,9 +1,40 @@
 import LeaderBoard from "@/components/LeaderBoard";
 import NavBar from "@/components/NavBar";
 import Image from "next/image";
-import React from "react";
+import { useRouter } from "next/router";
+import React, { useEffect } from "react";
 
 const Leaderboard = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    if (router.query.phone) {
+      postData(router.query.phone);
+    }
+  }, [router.query.phone]);
+  const postData = async (phone) => {
+    const data = {
+      phone: phone,
+    };
+
+    if (!phone) {
+      return;
+    }
+
+    try {
+      const response = await fetch("https://node.hivoco.com/api/get_top_5", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
   return (
     <div className="px-6 pt-7 pb-8 text-white flex flex-col  justify-between gap-4 h-full">
       <div className="flex flex-col gap-2.5  justify-between  h-3/5">

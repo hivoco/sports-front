@@ -12,10 +12,12 @@ const Login = () => {
   const [quiz, setQuiz] = useState([]);
 
   useEffect(() => {
-    if (router.query.data) {
-      setQuiz(JSON.parse(decodeURIComponent(router.query.data)));
+    const storedData = localStorage.getItem("data");
+    if (storedData) {
+      setQuiz(JSON.parse(storedData));
+      localStorage.removeItem("data"); // Optional: Clear after use
     }
-  }, [router.query.data]);
+  }, []);
 
   const postData = async () => {
     const data = {
@@ -41,6 +43,7 @@ const Login = () => {
       );
 
       const result = await response.json();
+      window.location.href=`/leaderboard?phone=${phone}`
     } catch (error) {
       console.error("Error:", error);
     }

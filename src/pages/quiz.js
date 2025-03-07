@@ -220,7 +220,7 @@ export default function Quiz() {
   };
 
   const fetchQuestions = async () => {
-    
+
     try {
       const response = await fetch(
         "https://node.hivoco.com/api/get_questions",
@@ -257,9 +257,8 @@ export default function Quiz() {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     } else {
-      window.location.href = `/login?data=${encodeURIComponent(
-        JSON.stringify(userResponceArray)
-      )}`;
+      localStorage.setItem("data", JSON.stringify(userResponceArray));
+      window.location.href = `/login`;
     }
   };
 
@@ -292,7 +291,7 @@ export default function Quiz() {
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
       if (data.is_correct && !bool) {
-        console.log("ha");
+       
         setSelectedOption(data.correct_answer);
         setUserResponceArray((prevArray) => [
           ...prevArray,
@@ -305,7 +304,7 @@ export default function Quiz() {
           },
         ]);
       } else if (!data.is_correct && !bool) {
-        console.log("nhi");
+        
         setSelectedOption(data.wrong_option);
         setSelectedOption(data.correct_answer);
         setUserResponceArray((prevArray) => [
