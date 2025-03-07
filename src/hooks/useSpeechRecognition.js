@@ -25,9 +25,10 @@ const useSpeechRecognition = (onSpeechEnd) => {
   };
 
   const startSpeechRecognition = () => {
+    if (recording || !recognition) return; // Prevent multiple starts
     setRecording(true);
     console.log("Recording Started");
-    recognition?.start();
+    recognition.start();
   };
 
   const stopSpeechRecognition = () => {

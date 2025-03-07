@@ -209,13 +209,13 @@ export default function Quiz() {
     if (isPlaying) {
       stopQuestionAudio();
     } else {
-      setAllowAudio(true);
+      // setAllowAudio(true);
       playQuestionAudio();
     }
   };
 
   const playQuestionAudio = () => {
-    // if (!allowAudio) return;
+    if (!allowAudio) return;
 
     if (audio) {
       audio.pause();
