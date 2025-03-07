@@ -486,7 +486,7 @@ export default function Quiz() {
             priority
           />
           <Image
-            onClick={toggleQuestionAudio}
+            // onClick={toggleQuestionAudio}
             src="/svg/Mute.svg"
             width={34}
             height={34}
