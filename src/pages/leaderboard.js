@@ -10,8 +10,6 @@ const Leaderboard = () => {
   useEffect(() => {
     if (router.query.phone) {
       postData(router.query.phone);
-    } else {
-      window.location.href = "/";
     }
   }, [router.query.phone]);
   const postData = async (phone) => {
