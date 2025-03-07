@@ -16,7 +16,7 @@ const LeaderBoard = ({ ranks }) => {
         >
           <span>{entry.rank}</span>
           <span>{entry.name}</span>
-          <span>Pts. {entry.rank}</span>
+          <span>Pts. {entry.score}</span>
         </div>
       ))}
     </div>

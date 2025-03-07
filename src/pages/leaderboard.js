@@ -105,7 +105,7 @@ const Leaderboard = () => {
             </div>
 
             <span className="font-Inter font-extrabold text-[24px] leading-7 text-center">
-              {leaderboard[0]?.rank || "0"}
+              {leaderboard[0]?.score || "0"}
               <br />
               pts.
             </span>
