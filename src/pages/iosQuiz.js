@@ -1,83 +1,120 @@
-"use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { X } from "lucide-react";
 import Link from "next/link";
 import Loading from "./loading";
-import { useSearchParams } from "next/navigation";
 import { useRecordVoice } from "@/hooks/useRecordVoice";
 import { blobToBase64 } from "@/components/helper";
 import VerifyLoading from "@/components/VerifyLoading";
+import ErrorFallback from "@/components/ErrorFallback";
+import { useRouter } from "next/router";
 
 export default function IosQuiz() {
-    const { recordingAudio, recording, startRecording, stopRecording } =
-      useRecordVoice();
-
+  const router = useRouter();
+  const { recordingAudio, recording, startRecording, stopRecording } =
+    useRecordVoice();
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [allowAudio, setAllowAudio] = useState(false); // Controls whether audio should play
+  const [allowAudio, setAllowAudio] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [selectedOptionForIcon, setSelectedOptionForIcon] = useState(null);
   const [isAnswerCorrect, setIsAnswerCorrect] = useState(null);
   const [correctOption, setCorrectOption] = useState(null);
   const [audio, setAudio] = useState(null);
-  const searchParams = useSearchParams();
   const [userResponceArray, setUserResponceArray] = useState([]);
   const [animationNumber, setAnimationNumber] = useState(0);
-  const [isLoading,setIsLoading] =useState(false)      
+  const [isLoading, setIsLoading] = useState(false);
+  const [micPermission, setMicPermission] = useState("unknown");
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isQuizCompleted, setIsQuizCompleted] = useState(false); // New state to track quiz completion
 
-  
-    useEffect(() => {
-      const timer1 = setTimeout(() => {
-        setAnimationNumber(1);
-      }, 1500);
-
-      const timer2 = setTimeout(() => {
-        // setAnimationNumber(2);
-      }, 1500);
-
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-        // clearTimeout(timer3);
-      };
-    }, []);
-
-    
-      const handleRecordingComplete = async (recordingAudio) => {
-        try {
-          const base64Audio = await blobToBase64(recordingAudio); // Convert blob to base64
-          verifyAnswer(base64Audio, false);
-        } catch (err) {
-          console.error("Error processing the recording blob", err);
-        }
-      };
-    
-      useEffect(() => {
-        if (recordingAudio) {
-          handleRecordingComplete(recordingAudio);
-        }
-      }, [recordingAudio]);
-
-
-  const language = searchParams.get("language") || "english";
+  // Get language from URL query parameter
+  const language = router.query.language || "english";
 
   useEffect(() => {
-    fetchQuestions();
-  }, [language]);
+    // Check microphone permission
+    if (typeof navigator !== "undefined" && navigator.permissions) {
+      navigator.permissions
+        .query({ name: "microphone" })
+        .then((permissionStatus) => {
+          setMicPermission(permissionStatus.state);
+          permissionStatus.onchange = () => {
+            setMicPermission(permissionStatus.state);
+          };
+        })
+        .catch(() => {
+          // Handle permission query failure silently
+          setMicPermission("unknown");
+        });
+    }
+  }, []);
 
-//   useEffect(() => {
-//     if (speechText) {
-//       verifyAnswer(speechText);
-//     }
-//   }, [speechText]);
+  const requestMicAccess = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+      });
+      // Make sure initialMediaRecorder is defined or this will throw an error
+      if (typeof initialMediaRecorder === "function") {
+        initialMediaRecorder(stream);
+      }
+      setMicPermission("granted");
+    } catch (err) {
+      setMicPermission("denied");
+      // User-friendly message without exposing technical details
+      setErrorMessage(
+        "Microphone access is required for this quiz. Please enable it in your browser settings and refresh the page."
+      );
+      return;
+    }
+  };
 
   useEffect(() => {
-    if (allowAudio) {
+    const timer1 = setTimeout(() => {
+      setAnimationNumber(1);
+    }, 1500);
+
+    return () => {
+      clearTimeout(timer1);
+    };
+  }, []);
+
+  const handleRecordingComplete = async (recordingAudio) => {
+    if (!recordingAudio) return;
+
+    try {
+      const base64Audio = await blobToBase64(recordingAudio);
+      verifyAnswer(base64Audio, false);
+    } catch (err) {
+      // Handle error silently without exposing details
+      console.error("Processing error");
+    }
+  };
+
+  useEffect(() => {
+    if (recordingAudio) {
+      handleRecordingComplete(recordingAudio);
+    }
+  }, [recordingAudio]);
+
+  useEffect(() => {
+    if (router.isReady && !isQuizCompleted) {
+      fetchQuestions();
+    }
+  }, [router.isReady, language, isQuizCompleted]);
+
+  useEffect(() => {
+    if (
+      allowAudio &&
+      questions.length > 0 &&
+      currentQuestionIndex < questions.length &&
+      !isQuizCompleted
+    ) {
       playQuestionAudio();
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, allowAudio, questions, isQuizCompleted]);
 
   const toggleQuestionAudio = () => {
     if (isPlaying) {
@@ -88,29 +125,40 @@ export default function IosQuiz() {
   };
 
   const playQuestionAudio = () => {
-    // if (!allowAudio) return;
-
     if (audio) {
       audio.pause();
     }
+
+    if (!questions[currentQuestionIndex]?.audio || isQuizCompleted) {
+      return;
+    }
+
     setAllowAudio(true);
-    const questionAudio = new Audio(
-      `data:audio/wav;base64,${questions[currentQuestionIndex]?.audio}`
-    );
+    try {
+      const questionAudio = new Audio(
+        `data:audio/wav;base64,${questions[currentQuestionIndex]?.audio}`
+      );
 
-    questionAudio
-      .play()
-      .then(() => {
-        setIsPlaying(true);
-        setAudio(questionAudio);
-      })
-      .catch((error) => console.error("Audio play error:", error));
+      questionAudio
+        .play()
+        .then(() => {
+          setIsPlaying(true);
+          setAudio(questionAudio);
+        })
+        .catch(() => {
+          setIsPlaying(false);
+          // Silent fail for audio issues
+        });
 
-    questionAudio.onended = () => {
+      questionAudio.onended = () => {
+        setIsPlaying(false);
+        if (selectedOption || isQuizCompleted) return;
+        handleStartRecording("audio");
+      };
+    } catch (error) {
+      // Silent fail for audio issues
       setIsPlaying(false);
-      if (selectedOption) return;
-      handleStartRecording();
-    };
+    }
   };
 
   const stopQuestionAudio = () => {
@@ -118,50 +166,95 @@ export default function IosQuiz() {
       audio.pause();
     }
     setIsPlaying(false);
-    setAllowAudio(false); // Prevent auto-play on question change
+    setAllowAudio(false);
   };
 
   const fetchQuestions = async () => {
+    if (isQuizCompleted) return; // Prevent fetching if quiz is completed
+
     try {
       const response = await fetch(
         "https://node.hivoco.com/api/get_questions",
         {
-          method: "POST", // HTTP method
+          method: "POST",
           headers: {
-            "Content-Type": "application/json", // Tells the server you're sending JSON data
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ lang: language }), // Convert data to JSON string
+          body: JSON.stringify({ lang: language }),
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to load questions");
+      }
+
       const data = await response.json();
-      setQuestions(data.questions);
+      if (data?.questions?.length > 0) {
+        setQuestions(data.questions);
+      } else {
+        setHasError(true);
+        setErrorMessage(
+          "Unable to load quiz questions. Please try again later."
+        );
+      }
     } catch (error) {
-      console.error("Error fetching questions:", error);
+      setHasError(true);
+      setErrorMessage("Unable to load quiz questions. Please try again later.");
     }
   };
 
   const handleSkip = () => {
+    if (isQuizCompleted) return; // Prevent actions if quiz is completed
+
     if (currentQuestionIndex < questions.length - 1) {
       resetState();
-      // setAllowAudio(true);
       setIsPlaying(false);
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     }
   };
 
   const handleSubmit = () => {
+    if (isQuizCompleted) return; // Prevent actions if quiz is completed
+
     if (selectedOption) {
       goToNextQuestion();
     }
   };
 
   const goToNextQuestion = () => {
+    if (isQuizCompleted) return; // Prevent actions if quiz is completed
+
     resetState();
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     } else {
+      completeQuiz();
+    }
+  };
+
+  // New function to handle quiz completion
+  const completeQuiz = () => {
+    setIsQuizCompleted(true); // Mark quiz as completed
+
+    // Stop any playing audio
+    if (audio) {
+      audio.pause();
+    }
+
+    try {
+      // Save data to localStorage
       localStorage.setItem("data", JSON.stringify(userResponceArray));
-      window.location.href = `/login`;
+
+      // Navigate to login page with delay to ensure state updates first
+      setTimeout(() => {
+        router.push("/login");
+      }, 300);
+    } catch (error) {
+      console.error("Error during quiz completion:", error);
+      // Even on error, try to navigate
+      setTimeout(() => {
+        router.push("/login");
+      }, 300);
     }
   };
 
@@ -172,17 +265,21 @@ export default function IosQuiz() {
   };
 
   const verifyAnswer = async (userAnswer, bool) => {
+    if (!questions[currentQuestionIndex] || isQuizCompleted) return;
+
     const body = {
       user_answer: userAnswer,
       question_id: questions[currentQuestionIndex].question_id,
       lang: language,
       onClick: bool,
       platform: "iOS",
-      option_one: questions[currentQuestionIndex].options[0],
+      option_one: questions[currentQuestionIndex]?.options?.[0] || "",
     };
+
     if (selectedOption) return;
+
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetch(
         "https://node.hivoco.com/api/verify_answer",
         {
@@ -191,73 +288,64 @@ export default function IosQuiz() {
           body: JSON.stringify(body),
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Answer verification failed");
+      }
+
       const data = await response.json();
-      setIsLoading(false)
+      setIsLoading(false);
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
-      if (data.is_correct && !bool) {
-        setSelectedOption(data.correct_answer);
-        setSelectedOptionForIcon(data.correct_answer);
-        setUserResponceArray((prevArray) => [
-          ...prevArray,
-          {
-            question: questions?.[currentQuestionIndex]?.question,
-            givenAns: data.correct_answer,
-            correctAns: data.correct_answer,
-            isCorrect: data.is_correct,
-            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
-          },
-        ]);
-        return;
-      } else if (!data.is_correct && !bool) {
-        setSelectedOption(data.wrong_option);
-        setSelectedOptionForIcon(data.wrong_option);
-        setUserResponceArray((prevArray) => [
-          ...prevArray,
-          {
-            question: questions?.[currentQuestionIndex]?.question,
-            givenAns: data.wrong_option,
-            correctAns: data.correct_answer,
-            isCorrect: data.is_correct,
-            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
-          },
-        ]);
-        return;
-      } else if (!data.is_correct && bool) {
-        setSelectedOption(data.wrong_option);
-        setUserResponceArray((prevArray) => [
-          ...prevArray,
-          {
-            question: questions?.[currentQuestionIndex]?.question,
-            givenAns: userAnswer,
-            correctAns: data.correct_answer,
-            isCorrect: data.is_correct,
-            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
-          },
-        ]);
-        return;
-      } else if (data.is_correct && bool) {
-        setSelectedOption(data.correct_answer);
-        setUserResponceArray((prevArray) => [
-          ...prevArray,
-          {
-            question: questions?.[currentQuestionIndex]?.question,
-            givenAns: userAnswer,
-            correctAns: data.correct_answer,
-            isCorrect: data.is_correct,
-            time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
-          },
-        ]);
-        return;
-      }
+
+      // Update user response array and selected option based on the response
+      updateUserResponses(data, userAnswer, bool);
     } catch (error) {
-      setIsLoading(false)
-      console.error("Error validating answer:", error);
+      setIsLoading(false);
+      // Silent fail without exposing error details
+      setSelectedOption(questions[currentQuestionIndex]?.options?.[0] || "");
     }
   };
 
+  const updateUserResponses = (data, userAnswer, isClickEvent) => {
+    const currentQuestion = questions?.[currentQuestionIndex]?.question || "";
+    let givenAnswer, isCorrect;
+
+    if (data.is_correct && !isClickEvent) {
+      givenAnswer = data.correct_answer;
+      isCorrect = true;
+      setSelectedOption(data.correct_answer);
+      setSelectedOptionForIcon(data.correct_answer);
+    } else if (!data.is_correct && !isClickEvent) {
+      givenAnswer = data.wrong_option;
+      isCorrect = false;
+      setSelectedOption(data.wrong_option);
+      setSelectedOptionForIcon(data.wrong_option);
+    } else if (!data.is_correct && isClickEvent) {
+      givenAnswer = userAnswer;
+      isCorrect = false;
+      setSelectedOption(data.wrong_option);
+    } else if (data.is_correct && isClickEvent) {
+      givenAnswer = userAnswer;
+      isCorrect = true;
+      setSelectedOption(data.correct_answer);
+    }
+
+    setUserResponceArray((prevArray) => [
+      ...prevArray,
+      {
+        question: currentQuestion,
+        givenAns: givenAnswer,
+        correctAns: data.correct_answer,
+        isCorrect: isCorrect,
+        time: Math.floor(Math.random() * (30 - 3 + 1)) + 3,
+      },
+    ]);
+  };
+
   const handleOptionClick = (option) => {
-    if (recording || selectedOption) return;
+    if (recording || selectedOption || isQuizCompleted) return;
+
     if (audio) {
       audio.pause();
     }
@@ -265,24 +353,49 @@ export default function IosQuiz() {
     verifyAnswer(option, true);
   };
 
-  const handleStartRecording = async () => {
-    if (audio) {
-      audio.pause();
+  const handleStartRecording = async (source) => {
+    if (audio || isQuizCompleted) {
+      audio?.pause();
     }
-    startRecording();
 
-    setTimeout(() => {
-      stopRecording();
-    }, 4000); // Stops recording after 4 seconds
-  };
-  const handleStopRecording = () => {
-    return;
+    if (micPermission === "denied" && source === "audio") return;
+
+    if (micPermission === "denied" && source === "click") {
+      setErrorMessage("Please allow microphone access in browser settings.");
+      requestMicAccess();
+      return;
+    }
+
+    try {
+      startRecording();
+      setTimeout(() => {
+        stopRecording();
+      }, 4000);
+    } catch (error) {
+      // Silent fail for recording errors
+    }
   };
 
-  const currentQuestion = questions[currentQuestionIndex];
-  if (!currentQuestion) {
+  if (hasError) {
+    return (
+      <ErrorFallback
+        message={
+          errorMessage || "Something went wrong. Please try again later."
+        }
+        onRetry={() => {
+          setHasError(false);
+          setIsQuizCompleted(false); // Reset completion state when retrying
+          fetchQuestions();
+        }}
+      />
+    );
+  }
+
+  if (!questions.length || !questions[currentQuestionIndex]) {
     return <Loading />;
   }
+
+  const currentQuestion = questions[currentQuestionIndex];
 
   return (
     <div className="font-Inter pt-7 pb-10 h-full flex flex-col justify-between text-[#28211D] overflow-hidden">
@@ -291,9 +404,8 @@ export default function IosQuiz() {
           <nav className="flex gap-2 items-center text-white">
             <Image
               className={`transition-all duration-700 ease-in-out
-
-            ${animationNumber >= 1 ? "scale-100" : "scale-125"}
-            `}
+                ${animationNumber >= 1 ? "scale-100" : "scale-125"}
+              `}
               src="/images/s-icon.png"
               width={24}
               height={34}
@@ -303,20 +415,20 @@ export default function IosQuiz() {
 
             <X
               className={`transition-all duration-100 ease-in-out
-                        ${animationNumber >= 1 ? "opacity-100 " : "opacity-0"}
-                        `}
+                ${animationNumber >= 1 ? "opacity-100 " : "opacity-0"}
+              `}
               size={24}
               color="white"
             />
 
             <Image
               className={`
-              transition-all duration-700 ease-in-out
-              ${
-                animationNumber >= 1
-                  ? "translate-x-0 scale-100"
-                  : "translate-x-[600%] scale-125"
-              }
+                transition-all duration-700 ease-in-out
+                ${
+                  animationNumber >= 1
+                    ? "translate-x-0 scale-100"
+                    : "translate-x-[600%] scale-125"
+                }
               `}
               src="/images/hv-circle-white.png"
               width={34}
@@ -329,8 +441,8 @@ export default function IosQuiz() {
 
         <div
           className={`flex flex-col gap-2.5 
-          transition-all duration-500 ease-in-out
-          ${animationNumber >= 1 ? "translate-x-0 " : "translate-x-[600%] "}
+            transition-all duration-500 ease-in-out
+            ${animationNumber >= 1 ? "translate-x-0 " : "translate-x-[600%] "}
           `}
         >
           <Link href={"/language-selection"}>
@@ -356,13 +468,13 @@ export default function IosQuiz() {
 
       <div
         className={`relative mx-7 
-        transition-all duration-700 ease-in-out
-        ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
+          transition-all duration-700 ease-in-out
+          ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
         `}
       >
         <div
           className={`
-            bg-white rotate3 h-full  py-6 px-7
+            bg-white rotate3 h-full py-6 px-7
             flex flex-col justifybetween gap-10 items-center rounded-3xl 
             relative z-20 rotate-3`}
         >
@@ -378,11 +490,11 @@ export default function IosQuiz() {
           <div className="flex flex-col gap-3 w-full -rotate-3">
             <div className="relative self-center">
               <Image
-                onClick={ handleStartRecording}
+                onClick={() => handleStartRecording("click")}
                 className={`self-center
                   transition-all duration-300 ease-in-out
                   ${animationNumber >= 1 ? "scale-100" : "scale-75"}
-                  `}
+                `}
                 src={
                   recording
                     ? "/images/listening.png"
@@ -446,27 +558,42 @@ export default function IosQuiz() {
 
       <div
         className={`flex gap-5 items-center px-6
-                transition-all duration-700 ease-in-out
-        ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
-    `}
+          transition-all duration-700 ease-in-out
+          ${animationNumber >= 1 ? "opacity-100" : "opacity-0"}
+        `}
       >
         <button
           onClick={handleSkip}
-          className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
+          disabled={isQuizCompleted}
+          className="capitalize h-12 bg-white/25 font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
         >
           Skip
         </button>
 
         <button
           onClick={handleSubmit}
-          className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
+          disabled={isQuizCompleted}
+          className="capitalize h-12 bg-white/25 font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
         >
           Submit
         </button>
-
-        
       </div>
       {isLoading && <VerifyLoading />}
+
+      {errorMessage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
+            <h3 className="font-semibold text-lg mb-2">Notice</h3>
+            <p className="mb-4">{errorMessage}</p>
+            <button
+              onClick={() => setErrorMessage("")}
+              className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

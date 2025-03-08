@@ -10,3 +10,4 @@ export function blobToBase64(blob) {
     reader.readAsDataURL(blob);
   });
 }
+
