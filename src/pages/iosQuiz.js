@@ -90,7 +90,7 @@ export default function IosQuiz() {
     } catch (err) {
       // Handle error silently without exposing details
       console.error("Processing error");
-      xa
+      xa;
     }
   };
 
@@ -205,7 +205,10 @@ export default function IosQuiz() {
 
   const handleSubmit = () => {
     if (isQuizCompleted) return; // Prevent actions if quiz is completed
-
+    stopQuestionAudio();
+    if (audio) {
+      audio.pause();
+    }
     if (selectedOption) {
       goToNextQuestion();
     }
@@ -335,7 +338,7 @@ export default function IosQuiz() {
 
   const handleOptionClick = (option) => {
     if (recording || selectedOption || isQuizCompleted) return;
-
+    stopQuestionAudio();
     if (audio) {
       audio.pause();
     }
