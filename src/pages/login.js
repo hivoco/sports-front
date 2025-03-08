@@ -7,8 +7,6 @@ import React, { useEffect, useState } from "react";
 const Login = () => {
   const [phone, setPhone] = useState("");
   const [name, setName] = useState("");
-
-  const router = useRouter();
   const [quiz, setQuiz] = useState([]);
 
   useEffect(() => {
