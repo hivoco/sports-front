@@ -1,4 +1,5 @@
 import NavBar from "@/components/NavBar";
+import { useMusic } from "@/contexts/MusicContext";
 import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -6,10 +7,10 @@ import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
 
 const SplashScreen = () => {
-  const [animationNumber,setAnimationNumber]=useState(0)
+  const [animationNumber, setAnimationNumber] = useState(0);
 
-  console.log(animationNumber, "animationNumber");
-  
+  const { isMusicEnabled, isPlaying, enableMusic, toggleMusic } = useMusic();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -26,7 +27,17 @@ const SplashScreen = () => {
       clearTimeout(timer2);
       // clearTimeout(timer3);
     };
-  }, [])
+  }, []);
+
+  const handleClick = () => {
+    // Handle music toggle
+    if (!isPlaying) {
+      toggleMusic();
+    }
+
+    // Navigate to terms page
+    router.push("/terms-and-conditions");
+  };
 
   return (
     <div className="px-6 pt-7 pb-8 flex flex-col justify-between h-full text-white overflow-hidden">
@@ -107,24 +118,20 @@ const SplashScreen = () => {
           LEAGUE QUIZ
         </h1>
 
-        <Link
+        <button
+          onClick={handleClick}
           className={`transition-all duration-700 ease-in-out
-              ${animationNumber >= 2 ? "translate-y-0" : "translate-y-[200%]"}
-          `}
-          href={"/terms-and-conditions"}
+          ${animationNumber >= 2 ? "translate-y-0" : "translate-y-[200%]"}
+          flex h-14 relative justify-center items-center font-Inter 
+          bg-white/25 font-semibold text-[20px] leading-6 text-center 
+          border border-white text-white w-full rounded-full`}
         >
-          <button
-            // onClick={() => router.push("terms-and-conditions")}
-            className="flex h-14 relative justify-center  items-center font-Inter bg-white/25 font-semibold text-[20px] leading-6 text-center border border-white text-white w-full
-            rounded-full"
-          >
-            <span className="">Start</span>
+          <span className="">Start</span>
 
-            <div className="absolute right-0 w-14 h-14 bg-white rounded-full  shadow-md border border-gray-200 flex justify-center items-center">
-              <ChevronRight className="" size={20} color="#001734" />
-            </div>
-          </button>
-        </Link>
+          <div className="absolute right-0 w-14 h-14 bg-white rounded-full shadow-md border border-gray-200 flex justify-center items-center">
+            <ChevronRight className="" size={20} color="#001734" />
+          </div>
+        </button>
       </div>
     </div>
   );

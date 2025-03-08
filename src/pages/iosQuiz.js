@@ -90,6 +90,7 @@ export default function IosQuiz() {
     } catch (err) {
       // Handle error silently without exposing details
       console.error("Processing error");
+      xa
     }
   };
 
@@ -125,40 +126,29 @@ export default function IosQuiz() {
   };
 
   const playQuestionAudio = () => {
+    // if (!allowAudio) return;
+
     if (audio) {
       audio.pause();
     }
-
-    if (!questions[currentQuestionIndex]?.audio || isQuizCompleted) {
-      return;
-    }
-
     setAllowAudio(true);
-    try {
-      const questionAudio = new Audio(
-        `data:audio/wav;base64,${questions[currentQuestionIndex]?.audio}`
-      );
+    const questionAudio = new Audio(
+      `data:audio/wav;base64,${questions[currentQuestionIndex]?.audio}`
+    );
 
-      questionAudio
-        .play()
-        .then(() => {
-          setIsPlaying(true);
-          setAudio(questionAudio);
-        })
-        .catch(() => {
-          setIsPlaying(false);
-          // Silent fail for audio issues
-        });
+    questionAudio
+      .play()
+      .then(() => {
+        setIsPlaying(true);
+        setAudio(questionAudio);
+      })
+      .catch((error) => console.error("Audio play error:", error));
 
-      questionAudio.onended = () => {
-        setIsPlaying(false);
-        if (selectedOption || isQuizCompleted) return;
-        handleStartRecording("audio");
-      };
-    } catch (error) {
-      // Silent fail for audio issues
+    questionAudio.onended = () => {
       setIsPlaying(false);
-    }
+      if (selectedOption) return;
+      handleStartRecording();
+    };
   };
 
   const stopQuestionAudio = () => {
@@ -166,7 +156,7 @@ export default function IosQuiz() {
       audio.pause();
     }
     setIsPlaying(false);
-    setAllowAudio(false);
+    setAllowAudio(false); // Prevent auto-play on question change
   };
 
   const fetchQuestions = async () => {
@@ -205,7 +195,7 @@ export default function IosQuiz() {
 
   const handleSkip = () => {
     if (isQuizCompleted) return; // Prevent actions if quiz is completed
-
+    stopQuestionAudio();
     if (currentQuestionIndex < questions.length - 1) {
       resetState();
       setIsPlaying(false);

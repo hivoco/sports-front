@@ -5,8 +5,7 @@ import React, { useEffect, useState } from "react";
 
 const LandingDisplay = () => {
   const [animationNumber, setAnimationNumber] = useState(0);
-  console.log(animationNumber,"animationNumber");
-  
+
   const router = useRouter();
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -21,24 +20,21 @@ const LandingDisplay = () => {
       setAnimationNumber(3);
     }, 8000);
 
-
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
-
     };
   }, []);
 
   useEffect(() => {
-    const timer = 
-    setTimeout(() => {
+    const timer = setTimeout(() => {
       router.push("/splash-screen");
     }, 9500);
 
-    return ()=>{
-      clearTimeout(timer)
-    }
+    return () => {
+      clearTimeout(timer);
+    };
   }, []);
 
   return (

@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useRouter } from "next/router";
 import { useSearchParams } from "next/navigation";
+import Loading from "./loading";
 
 const PlatformQuiz = () => {
   const router = useRouter();
-    const searchParams = useSearchParams();
-    const language = searchParams.get("language");
+  const searchParams = useSearchParams();
+  const language = searchParams.get("language");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -16,22 +17,22 @@ const PlatformQuiz = () => {
         platform = "iOS"; // Detect iOS
       }
 
-      console.log(platform,"platform");
-      
+      console.log(platform, "platform");
+
       // Redirect based on platform
       if (platform == "iOS") {
-        console.log(language,platform,"ios");
-        
-        router.push(`/iosQuiz?language=${language}`); // Redirect to iOS quiz        
+        console.log(language, platform, "ios");
+
+        router.push(`/iosQuiz?language=${language}`); // Redirect to iOS quiz
       } else {
-        console.log(language,platform,"android");
+        console.log(language, platform, "android");
 
         router.push(`/quiz?language=${language}`); // Redirect to Android quiz
       }
     }
   }, [router]);
 
-  return <p>Detecting platform & redirecting...</p>; // Show while redirecting
+  return <></>; // Show while redirecting
 };
 
 export default PlatformQuiz;

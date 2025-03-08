@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
- 
+  devIndicators: false,
+
   // Disable serverless functions error display in production
   onDemandEntries: {
     // Keep the error display minimal in production

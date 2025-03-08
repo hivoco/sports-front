@@ -199,7 +199,7 @@ export default function Quiz() {
 
   const handleSkip = () => {
     if (isQuizCompleted) return;
-
+    stopQuestionAudio();
     if (currentQuestionIndex < questions.length - 1) {
       resetState();
       setIsPlaying(false);
@@ -291,7 +291,15 @@ export default function Quiz() {
       setIsLoading(false);
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
-
+      if (data.isCorrect) {
+        const newAudio = new Audio("/music/wrongAnswer.mp3");
+        setAudio(newAudio);
+        newAudio.play(); //
+      } else {
+        const newAudio = new Audio("/music/wrongAnswer.mp3");
+        setAudio(newAudio);
+        newAudio.play(); //
+      }
       // Update user response array and selected option based on the response
       updateUserResponses(data, userAnswer, bool);
     } catch (error) {
