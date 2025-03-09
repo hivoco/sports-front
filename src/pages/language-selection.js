@@ -10,14 +10,14 @@ const LanguageSelection = () => {
 
   return (
     <div
-      className={`relative pt-7 flex flex-col gap-y-14 h-full
+      className={`relative pt-7 flex flex-col gap-16 h-full
     `}
     >
       <div className="px-6">
         <NavBar />
       </div>
 
-      <div className="px-6 flex flex-col gap-y-6">
+      <div className="px-6 flex flex-col gap-2">
 
 
         <h2 className="font-Theo  font-normal text-[42px] leading-[38px] tracking-[0.02em] text-center text-white">
@@ -29,7 +29,7 @@ const LanguageSelection = () => {
         </p>
       </div>
 
-      <div className="flex flex-col gap-y-5 justify-center items-center px-7">
+      <div className={`absolute top-1/2 -translate-y-1/2  w-full flex flex-col gap-5 justify-center items-center px-7`}>
         <button
           onClick={() => {
             setSelectedOption("english");

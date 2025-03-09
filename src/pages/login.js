@@ -103,7 +103,11 @@ const Login = () => {
               style={{ textShadow: "-4px 2px 4px #FFFFFF40" }}
               className={`font-Theo font-normal text-[64px] leading-[38px] tracking-[0.08em] text-center text-white
               transition-all duration-500 ease-in-out
-              ${animationNumber >= 1 ? "scale-100" : "scale-50"}
+              ${
+                animationNumber >= 1
+                  ? "scale-100 opacity-100"
+                  : "scale-50 opacity-0"
+              }
                 `}
             >
               LEGENDS
@@ -112,7 +116,7 @@ const Login = () => {
             <h3
               className={`font-Inter font-medium text-[16px] leading-5 text-center tracking-[0.2em] text-white
                 transition-all duration-500 ease-in-out
-                ${animationNumber >= 1 ? "translate-y-0" : "translate-y-1/2"}
+                ${animationNumber >= 1 ? "translate-y-0 opacity-100" : " opacity-0"}
               `}
             >
               FACE OFF
@@ -158,7 +162,9 @@ const Login = () => {
 
           <div
             className={`flex items-center py-4 font-Inter  font-medium text-[18px] leading-[18px] px-5 border border-white  w-full  rounded-full
-                     ${phone ? "bg-white text-black" : "bg-white/25 text-white "}
+                     ${
+                       phone ? "bg-white text-black" : "bg-white/25 text-white "
+                     }
            `}
           >
             <span>+91</span>

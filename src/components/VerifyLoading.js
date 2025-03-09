@@ -15,7 +15,7 @@ function VerifyLoading() {
         />
 
         <div className="flex items-center font-Inter text-lg text-center text-black font-normal mt-2  tracking-wide ">
-          <span className="uppercase ">Loading</span>
+          <span className="uppercase ">Checking your answer</span>
           <span className="dot1 ">.</span>
           <span className="dot2 ">.</span>
           <span className="dot3 ">.</span>

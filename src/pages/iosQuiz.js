@@ -12,7 +12,7 @@ import ErrorFallback from "@/components/ErrorFallback";
 import { useRouter } from "next/router";
 
 export default function IosQuiz() {
-    const { recordingAudio, recording, startRecording, stopRecording } =
+    const { recordingAudio, recording, startRecording, stopRecording,permissionState } =
       useRecordVoice();
       const router = useRouter();
 
@@ -121,7 +121,7 @@ export default function IosQuiz() {
     questionAudio.onended = () => {
       setIsPlaying(false);
       if (selectedOption) return;
-      handleStartRecording();
+      handleStartRecording("audio");
     };
   };
 
@@ -350,9 +350,16 @@ export default function IosQuiz() {
     verifyAnswer(option, true);
   };
 
-  const handleStartRecording = async () => {
+  const handleStartRecording = async (source) => {
     if (audio) {
       audio.pause();
+    }
+    if(selectedOption)return
+    if(permissionState==="denied" && source==="audio") return
+    if(permissionState==="denied" && source==="click") {
+      console.log("object")
+      setErrorMessage("Please allow microphone in browser setting")
+      return
     }
     startRecording();
 
@@ -479,7 +486,7 @@ export default function IosQuiz() {
           <div className="flex flex-col gap-3 w-full -rotate-3">
             <div className="relative self-center">
               <Image
-                onClick={ handleStartRecording}
+                onClick={ ()=>handleStartRecording("click")}
                 className={`self-center
                   transition-all duration-300 ease-in-out
                   ${animationNumber >= 1 ? "scale-100" : "scale-75"}
@@ -570,6 +577,20 @@ export default function IosQuiz() {
         
       </div>
       {isLoading && <VerifyLoading />}
+      {errorMessage && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg max-w-sm w-full mx-4">
+            <h3 className="font-semibold text-lg mb-2">Notice</h3>
+            <p className="mb-4">{errorMessage}</p>
+            <button
+              onClick={() => setErrorMessage("")}
+              className="w-full py-2 bg-blue-600 text-white rounded-lg font-semibold"
+            >
+              OK
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
