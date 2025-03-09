@@ -153,6 +153,7 @@ export default function Quiz() {
 
   const handleSkip = () => {
     if (isQuizCompleted) return;
+    if(recording) return
     if (audio) {
       audio.pause();
     }

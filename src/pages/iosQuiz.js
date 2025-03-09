@@ -245,6 +245,7 @@ export default function IosQuiz() {
   };
 
   const verifyAnswer = async (userAnswer, bool) => {
+    if(!questions[currentQuestionIndex] || isQuizCompleted) return
     const body = {
       user_answer: userAnswer,
       question_id: questions[currentQuestionIndex].question_id,
@@ -552,6 +553,7 @@ export default function IosQuiz() {
       >
         <button
           onClick={handleSkip}
+          disabled={isQuizCompleted}
           className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
         >
           Skip
@@ -559,6 +561,7 @@ export default function IosQuiz() {
 
         <button
           onClick={handleSubmit}
+          disabled={isQuizCompleted}
           className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
         >
           Submit
