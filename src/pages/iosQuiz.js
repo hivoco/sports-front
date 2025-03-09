@@ -8,10 +8,14 @@ import { useSearchParams } from "next/navigation";
 import { useRecordVoice } from "@/hooks/useRecordVoice";
 import { blobToBase64 } from "@/components/helper";
 import VerifyLoading from "@/components/VerifyLoading";
+import ErrorFallback from "@/components/ErrorFallback";
+import { useRouter } from "next/router";
 
 export default function IosQuiz() {
     const { recordingAudio, recording, startRecording, stopRecording } =
       useRecordVoice();
+      const router = useRouter();
+
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -25,7 +29,12 @@ export default function IosQuiz() {
   const searchParams = useSearchParams();
   const [userResponceArray, setUserResponceArray] = useState([]);
   const [animationNumber, setAnimationNumber] = useState(0);
-  const [isLoading,setIsLoading] =useState(false)      
+  const [isLoading,setIsLoading] =useState(false)   
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(""); 
+  const [isQuizCompleted, setIsQuizCompleted] = useState(false);
+  
+  
 
   
     useEffect(() => {
@@ -64,8 +73,11 @@ export default function IosQuiz() {
   const language = searchParams.get("language") || "english";
 
   useEffect(() => {
-    fetchQuestions();
-  }, [language]);
+    if (router.isReady && !isQuizCompleted) {
+      fetchQuestions();
+    }
+  }, [router.isReady, language, isQuizCompleted]);
+
 
 //   useEffect(() => {
 //     if (speechText) {
@@ -122,25 +134,51 @@ export default function IosQuiz() {
   };
 
   const fetchQuestions = async () => {
+    if (isQuizCompleted) return;
+
+    if (isQuizCompleted) return; // Prevent fetching if quiz is completed
+
     try {
       const response = await fetch(
         "https://node.hivoco.com/api/get_questions",
         {
-          method: "POST", // HTTP method
+          method: "POST",
           headers: {
-            "Content-Type": "application/json", // Tells the server you're sending JSON data
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ lang: language }), // Convert data to JSON string
+          body: JSON.stringify({ lang: language }),
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to load questions");
+      }
+
       const data = await response.json();
-      setQuestions(data.questions);
+      if (data?.questions?.length > 0) {
+        setQuestions(data.questions);
+      } else {
+        setHasError(true);
+        setErrorMessage(
+          "Unable to load quiz questions. Please try again later."
+        );
+      }
     } catch (error) {
-      console.error("Error fetching questions:", error);
+      setHasError(true);
+      setErrorMessage("Unable to load quiz questions. Please try again later.");
     }
   };
-
   const handleSkip = () => {
+    if (recording) {
+      return
+    }
+    // stopRecording()
+
+    if (isQuizCompleted) return;
+    if (audio) {
+      audio.pause();
+    }
+
     if (currentQuestionIndex < questions.length - 1) {
       resetState();
       // setAllowAudio(true);
@@ -150,18 +188,53 @@ export default function IosQuiz() {
   };
 
   const handleSubmit = () => {
+    if (isQuizCompleted) return;
+
     if (selectedOption) {
+      if (audio) {
+        audio.pause();
+      }
+
       goToNextQuestion();
+  
     }
   };
 
   const goToNextQuestion = () => {
+    if (isQuizCompleted) return;
+
+    if (isQuizCompleted) return; // Prevent actions if quiz is completed
+
     resetState();
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     } else {
+      completeQuiz();
+    }
+  };
+
+  const completeQuiz = () => {
+    setIsQuizCompleted(true); // Mark quiz as completed
+
+    // Stop any playing audio
+    if (audio) {
+      audio.pause();
+    }
+
+    try {
+      // Save data to localStorage
       localStorage.setItem("data", JSON.stringify(userResponceArray));
-      window.location.href = `/login`;
+
+      // Navigate to login page with delay to ensure state updates first
+      setTimeout(() => {
+        router.push("/login");
+      }, 300);
+    } catch (error) {
+      console.error("Error during quiz completion:", error);
+      // Even on error, try to navigate
+      setTimeout(() => {
+        router.push("/login");
+      }, 300);
     }
   };
 
@@ -191,7 +264,18 @@ export default function IosQuiz() {
           body: JSON.stringify(body),
         }
       );
+
       const data = await response.json();
+      if (data.is_correct) {
+        const newAudio = new Audio("/music/rightAnswer.mp3");
+        setAudio(newAudio);
+        newAudio.play(); //
+      } else {
+        const newAudio = new Audio("/music/wrongAnswer.mp3");
+        setAudio(newAudio);
+        newAudio.play(); //
+      }
+
       setIsLoading(false)
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
@@ -282,6 +366,22 @@ export default function IosQuiz() {
   const currentQuestion = questions[currentQuestionIndex];
   if (!currentQuestion) {
     return <Loading />;
+  }
+
+
+  if (hasError) {
+    return (
+      <ErrorFallback
+        message={
+          errorMessage || "Something went wrong. Please try again later."
+        }
+        onRetry={() => {
+          setHasError(false);
+          setIsQuizCompleted(false); // Reset completion state when retrying
+          fetchQuestions();
+        }}
+      />
+    );
   }
 
   return (

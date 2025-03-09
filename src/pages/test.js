@@ -171,7 +171,7 @@ const TermsAndConditions = () => {
         </Link>
       </div>
 
-      <Image
+      {/* <Image
         // out of the flow
         className="absolute z-10 top-0 left-1/2 transform -translate-x-1/2"
         width={341}
@@ -179,7 +179,7 @@ const TermsAndConditions = () => {
         src={"/images/Light element.png"}
         alt="light"
         priority
-      />
+      /> */}
     </div>
   );
 };

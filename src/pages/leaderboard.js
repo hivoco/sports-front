@@ -63,7 +63,7 @@ const Leaderboard = () => {
         <NavBar />
 
         <div className="flex flex-col gap-0 flex-1 justify-between">
-          <div className="relative flex w-full gap-10 justify-center items-center  mb-4">
+          <div className="relative flex flex-1 w-full gap-10 justify-center items-center  mb-4">
             <Image
               className=""
               src="/images/rm-club.png"
@@ -100,15 +100,15 @@ const Leaderboard = () => {
             style={{
               textShadow: "-4px 2px 4px #FFFFFF40",
             }}
-            className={`font-Theo font-normal text-[52px] leading-[38px] text-center tracking-[0.08em] 
-              transition-all duration-700 ease-in-out
+            className={` font-Theo font-normal text-[52px] leading[38px] leading-[0.75] text-center tracking-[0.08em] 
+              transition-all duration-700 ease-in-out 
               ${animationNumber >= 1 ? "scale-100" : "scale-0"}
               `}
           >
             LEADERBOARD
           </h1>
 
-          <div className="flex justify-between items-center px-4 ">
+          <div className="flex flex-1 justify-between items-center px-4 ">
             <span
               className={`font-Theo font-normal text-[32px] leading-8 text-center
               transition-all duration-700 ease-in-out
@@ -133,6 +133,16 @@ const Leaderboard = () => {
                   priority
                 />
               </div>
+{/* 
+              <Image
+              className="object-cover"
+                src="/images/prize-and-star.png"
+                width={66}
+                height={116}
+                alt=" trophy"
+                priority
+              /> */}
+
               <p
                 className={`font-Theo font-normal text-[28px] leading-7 tracking-[0.04em] text-center
                 transition-all duration-700 ease-in-out 

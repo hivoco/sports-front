@@ -139,6 +139,7 @@ const Login = () => {
         <div className="flex flex-col gap-3">
           <input
             // autoComplete="name"
+            autocomplete="off"
             type="text"
             inputMode="text"
             name="name"
@@ -147,19 +148,23 @@ const Login = () => {
             }}
             value={name}
             minLength={3}
-            maxLength={10}
+            maxLength={20}
             placeholder="Full Name"
-            className={`flex py-4 font-Inter font-medium text-[18px] leading-[18px] px-5 border border-white bg-white/25  text-white w-full
-          rounded-full placeholder:text-white/50 outline-none`}
+            className={`flex py-4 font-Inter font-medium text-[18px] leading-[18px] px-5 border border-white   w-full
+          rounded-full placeholder:text-white/50 outline-none
+          ${name ? "bg-white text-black" : "bg-white/25 text-white "}
+          `}
           />
 
-          <div className={`flex items-center py-4 font-Inter  font-medium text-[18px] leading-[18px] px-5 border border-white bg-white/25 text-white w-full  rounded-full
-            `}>
+          <div
+            className={`flex items-center py-4 font-Inter  font-medium text-[18px] leading-[18px] px-5 border border-white  w-full  rounded-full
+                     ${phone ? "bg-white text-black" : "bg-white/25 text-white "}
+           `}
+          >
             <span>+91</span>
             <input
               type="tel"
               autocomplete="off"
-
               placeholder="Phone number"
               maxLength={10}
               // autoComplete="tel"

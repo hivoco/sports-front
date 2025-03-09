@@ -7,6 +7,8 @@ import Loading from "./loading";
 import { useSearchParams } from "next/navigation";
 import useSpeechRecognition from "@/hooks/useSpeechRecognition";
 import VerifyLoading from "@/components/VerifyLoading";
+import ErrorFallback from "@/components/ErrorFallback";
+import { useRouter } from "next/router";
 
 export default function Quiz() {
   const {
@@ -28,32 +30,36 @@ export default function Quiz() {
   const searchParams = useSearchParams();
   const [userResponceArray, setUserResponceArray] = useState([]);
   const [animationNumber, setAnimationNumber] = useState(0);
-  const [isLoading,setIsLoading] =useState(false)
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasError, setHasError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   console.log(animationNumber, "animationNumber");
-      
-  
-    useEffect(() => {
-      const timer1 = setTimeout(() => {
-        setAnimationNumber(1);
-      }, 1500);
+  const router=useRouter()
 
-      const timer2 = setTimeout(() => {
-        setAnimationNumber(2);
-      }, 1500);
+  useEffect(() => {
+    const timer1 = setTimeout(() => {
+      setAnimationNumber(1);
+    }, 1500);
 
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-        // clearTimeout(timer3);
-      };
-    }, []);
+    const timer2 = setTimeout(() => {
+      setAnimationNumber(2);
+    }, 1500);
 
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      // clearTimeout(timer3);
+    };
+  }, []);
 
   const language = searchParams.get("language") || "english";
 
   useEffect(() => {
-    fetchQuestions();
-  }, [language]);
+    if (router.isReady && !isQuizCompleted) {
+      fetchQuestions();
+    }
+  }, [router.isReady, language, isQuizCompleted]);
 
   useEffect(() => {
     if (speechText) {
@@ -110,25 +116,47 @@ export default function Quiz() {
   };
 
   const fetchQuestions = async () => {
+    if (isQuizCompleted) return;
+
+    if (isQuizCompleted) return; // Prevent fetching if quiz is completed
+
     try {
       const response = await fetch(
         "https://node.hivoco.com/api/get_questions",
         {
-          method: "POST", // HTTP method
+          method: "POST",
           headers: {
-            "Content-Type": "application/json", // Tells the server you're sending JSON data
+            "Content-Type": "application/json",
           },
-          body: JSON.stringify({ lang: language }), // Convert data to JSON string
+          body: JSON.stringify({ lang: language }),
         }
       );
+
+      if (!response.ok) {
+        throw new Error("Failed to load questions");
+      }
+
       const data = await response.json();
-      setQuestions(data.questions);
+      if (data?.questions?.length > 0) {
+        setQuestions(data.questions);
+      } else {
+        setHasError(true);
+        setErrorMessage(
+          "Unable to load quiz questions. Please try again later."
+        );
+      }
     } catch (error) {
-      console.error("Error fetching questions:", error);
+      setHasError(true);
+      setErrorMessage("Unable to load quiz questions. Please try again later.");
     }
   };
 
   const handleSkip = () => {
+    if (isQuizCompleted) return;
+    if (audio) {
+      audio.pause();
+    }
+
     if (currentQuestionIndex < questions.length - 1) {
       resetState();
       // setAllowAudio(true);
@@ -138,18 +166,52 @@ export default function Quiz() {
   };
 
   const handleSubmit = () => {
+    if (isQuizCompleted) return;
     if (selectedOption) {
+      if (audio) {
+        audio.pause();
+      }
+
       goToNextQuestion();
+  
     }
   };
 
   const goToNextQuestion = () => {
+    if (isQuizCompleted) return;
+
+    if (isQuizCompleted) return; // Prevent actions if quiz is completed
+
     resetState();
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex((prevIndex) => prevIndex + 1);
     } else {
+      completeQuiz();
+    }
+  };
+
+  const completeQuiz = () => {
+    setIsQuizCompleted(true); // Mark quiz as completed
+
+    // Stop any playing audio
+    if (audio) {
+      audio.pause();
+    }
+
+    try {
+      // Save data to localStorage
       localStorage.setItem("data", JSON.stringify(userResponceArray));
-      window.location.href = `/login`;
+
+      // Navigate to login page with delay to ensure state updates first
+      setTimeout(() => {
+        router.push("/login");
+      }, 300);
+    } catch (error) {
+      console.error("Error during quiz completion:", error);
+      // Even on error, try to navigate
+      setTimeout(() => {
+        router.push("/login");
+      }, 300);
     }
   };
 
@@ -170,7 +232,7 @@ export default function Quiz() {
     };
     if (selectedOption) return;
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetch(
         "https://node.hivoco.com/api/verify_answer",
         {
@@ -180,7 +242,16 @@ export default function Quiz() {
         }
       );
       const data = await response.json();
-      setIsLoading(false)
+      setIsLoading(false);
+      if (data.is_correct) {
+        const newAudio = new Audio("/music/rightAnswer.mp3");
+        setAudio(newAudio);
+        newAudio.play(); //
+      } else {
+        const newAudio = new Audio("/music/wrongAnswer.mp3");
+        setAudio(newAudio);
+        newAudio.play(); //
+      }
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
       if (data.is_correct && !bool) {
@@ -237,11 +308,9 @@ export default function Quiz() {
           },
         ]);
         return;
-
       }
-
     } catch (error) {
-      setIsLoading(false)
+      setIsLoading(false);
       console.error("Error validating answer:", error);
     }
   };
@@ -269,6 +338,21 @@ export default function Quiz() {
   const currentQuestion = questions[currentQuestionIndex];
   if (!currentQuestion) {
     return <Loading />;
+  }
+
+  if (hasError) {
+    return (
+      <ErrorFallback
+        message={
+          errorMessage || "Something went wrong. Please try again later."
+        }
+        onRetry={() => {
+          setHasError(false);
+          setIsQuizCompleted(false); // Reset completion state when retrying
+          fetchQuestions();
+        }}
+      />
+    );
   }
 
   return (
@@ -353,7 +437,7 @@ export default function Quiz() {
             flex flex-col justifybetween gap-10 items-center rounded-3xl 
             relative z-20 rotate-3`}
         >
-          <div className="flex flex-col gap-3 -rotate-3 ">
+          <div className="flex flex-col gap-3 -rotate-3">
             <span className="font-semibold text-[14px] leading-[17px]">
               {currentQuestionIndex + 1}/{questions.length}
             </span>
@@ -399,7 +483,7 @@ export default function Quiz() {
                 <button
                   key={index}
                   onClick={() => handleOptionClick(option)}
-                  className={`font-medium text-[16px] leading-5 text-center flex items-center justify-between border border-[#001734] px-6 py-3 rounded-full capitalize ${
+                  className={`font-medium text-[16px] leading-5 text-center flex items-center justify-between border border-[#28211D] px-6 py-3 rounded-full capitalize ${
                     selectedOption?.trim().toLowerCase() ===
                     option?.trim().toLowerCase()
                       ? isAnswerCorrect
@@ -411,15 +495,16 @@ export default function Quiz() {
                   {option}
 
                   {selectedOptionForIcon?.trim().toLowerCase() ===
-                    option?.trim().toLowerCase() && (
-                    <Image
-                      src="/svg/tick-circle-solid.svg"
-                      width={24}
-                      height={24}
-                      alt="tick image"
-                      priority
-                    />
-                  )}
+                    option?.trim().toLowerCase() &&
+                    isAnswerCorrect && (
+                      <Image
+                        src="/svg/tick-circle-solid.svg"
+                        width={24}
+                        height={24}
+                        alt="tick image"
+                        priority
+                      />
+                    )}
                 </button>
               ))}
             </div>
@@ -439,14 +524,14 @@ export default function Quiz() {
       >
         <button
           onClick={handleSkip}
-          className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
+          className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px]  px-5 border border-white text-white w-full rounded-full"
         >
           Skip
         </button>
 
         <button
           onClick={handleSubmit}
-          className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px] leading-6 px-5 border border-white text-white w-full rounded-full"
+          className="capitalize h-12 bg-white/25  font-Inter font-semibold text-[20px]  px-5 border border-white text-white w-full rounded-full"
         >
           Submit
         </button>
