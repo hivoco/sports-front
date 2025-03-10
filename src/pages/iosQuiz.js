@@ -119,7 +119,7 @@ export default function IosQuiz() {
     questionAudio.onended = () => {
       setIsPlaying(false);
       if (selectedOption) return;
-      handleStartRecording("audio");
+      // handleStartRecording("audio");
     };
   };
 
