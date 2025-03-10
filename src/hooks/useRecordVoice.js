@@ -51,14 +51,14 @@
 //     setMediaRecorder(mediaRecorder);
 //   };
 
-//   useEffect(() => {
-//     if (typeof window !== "undefined") {
-//       navigator.mediaDevices
-//         .getUserMedia({ audio: true })
-//         .then(initialMediaRecorder)
-//         .catch((err) => console.error("Error accessing microphone:", err));
-//     }
-//   }, []);
+// useEffect(() => {
+//   if (typeof window !== "undefined") {
+//     navigator.mediaDevices
+//       .getUserMedia({ audio: true })
+//       .then(initialMediaRecorder)
+//       .catch((err) => console.error("Error accessing microphone:", err));
+//   }
+// }, []);
 
 //   return { recordingAudio, recording, startRecording, stopRecording };
 // };
@@ -168,6 +168,15 @@ export const useRecordVoice = () => {
   const [recordingAudio, setRecordingAudio] = useState(null);
   const [permissionState, setPermissionState] = useState("pending"); // "pending", "granted", "denied"
   const chunks = useRef([]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      navigator.mediaDevices
+        .getUserMedia({ audio: true })
+        .then(initialMediaRecorder)
+        .catch((err) => console.error("Error accessing microphone:", err));
+    }
+  }, []);
 
   // Function to start the recording
   const startRecording = () => {
