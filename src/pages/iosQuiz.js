@@ -12,10 +12,14 @@ import ErrorFallback from "@/components/ErrorFallback";
 import { useRouter } from "next/router";
 
 export default function IosQuiz() {
-    const { recordingAudio, recording, startRecording, stopRecording,permissionState } =
-      useRecordVoice();
-      const router = useRouter();
-
+  const {
+    recordingAudio,
+    recording,
+    startRecording,
+    stopRecording,
+    permissionState,
+  } = useRecordVoice();
+  const router = useRouter();
 
   const [questions, setQuestions] = useState([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -29,46 +33,41 @@ export default function IosQuiz() {
   const searchParams = useSearchParams();
   const [userResponceArray, setUserResponceArray] = useState([]);
   const [animationNumber, setAnimationNumber] = useState(0);
-  const [isLoading,setIsLoading] =useState(false)   
+  const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
-  
-  
 
-  
-    useEffect(() => {
-      const timer1 = setTimeout(() => {
-        setAnimationNumber(1);
-      }, 1500);
+  useEffect(() => {
+    const timer1 = setTimeout(() => {
+      setAnimationNumber(1);
+    }, 1500);
 
-      const timer2 = setTimeout(() => {
-        // setAnimationNumber(2);
-      }, 1500);
+    const timer2 = setTimeout(() => {
+      // setAnimationNumber(2);
+    }, 1500);
 
-      return () => {
-        clearTimeout(timer1);
-        clearTimeout(timer2);
-        // clearTimeout(timer3);
-      };
-    }, []);
+    return () => {
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      // clearTimeout(timer3);
+    };
+  }, []);
 
-    
-      const handleRecordingComplete = async (recordingAudio) => {
-        try {
-          const base64Audio = await blobToBase64(recordingAudio); // Convert blob to base64
-          verifyAnswer(base64Audio, false);
-        } catch (err) {
-          console.error("Error processing the recording blob", err);
-        }
-      };
-    
-      useEffect(() => {
-        if (recordingAudio) {
-          handleRecordingComplete(recordingAudio);
-        }
-      }, [recordingAudio]);
+  const handleRecordingComplete = async (recordingAudio) => {
+    try {
+      const base64Audio = await blobToBase64(recordingAudio); // Convert blob to base64
+      verifyAnswer(base64Audio, false);
+    } catch (err) {
+      console.error("Error processing the recording blob", err);
+    }
+  };
 
+  useEffect(() => {
+    if (recordingAudio) {
+      handleRecordingComplete(recordingAudio);
+    }
+  }, [recordingAudio]);
 
   const language = searchParams.get("language") || "english";
 
@@ -78,12 +77,11 @@ export default function IosQuiz() {
     }
   }, [router.isReady, language, isQuizCompleted]);
 
-
-//   useEffect(() => {
-//     if (speechText) {
-//       verifyAnswer(speechText);
-//     }
-//   }, [speechText]);
+  //   useEffect(() => {
+  //     if (speechText) {
+  //       verifyAnswer(speechText);
+  //     }
+  //   }, [speechText]);
 
   useEffect(() => {
     if (allowAudio) {
@@ -121,7 +119,7 @@ export default function IosQuiz() {
     questionAudio.onended = () => {
       setIsPlaying(false);
       if (selectedOption) return;
-      // handleStartRecording("audio");
+      handleStartRecording("audio");
     };
   };
 
@@ -170,7 +168,7 @@ export default function IosQuiz() {
   };
   const handleSkip = () => {
     if (recording) {
-      return
+      return;
     }
     // stopRecording()
 
@@ -196,7 +194,6 @@ export default function IosQuiz() {
       }
 
       goToNextQuestion();
-  
     }
   };
 
@@ -245,7 +242,7 @@ export default function IosQuiz() {
   };
 
   const verifyAnswer = async (userAnswer, bool) => {
-    if(!questions[currentQuestionIndex] || isQuizCompleted) return
+    if (!questions[currentQuestionIndex] || isQuizCompleted) return;
     const body = {
       user_answer: userAnswer,
       question_id: questions[currentQuestionIndex].question_id,
@@ -256,7 +253,7 @@ export default function IosQuiz() {
     };
     if (selectedOption) return;
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const response = await fetch(
         "https://node.hivoco.com/api/verify_answer",
         {
@@ -277,7 +274,7 @@ export default function IosQuiz() {
         newAudio.play(); //
       }
 
-      setIsLoading(false)
+      setIsLoading(false);
       setIsAnswerCorrect(data.is_correct);
       setCorrectOption(data.correct_option);
       if (data.is_correct && !bool) {
@@ -336,7 +333,7 @@ export default function IosQuiz() {
         return;
       }
     } catch (error) {
-      setIsLoading(false)
+      setIsLoading(false);
       console.error("Error validating answer:", error);
     }
   };
@@ -354,12 +351,12 @@ export default function IosQuiz() {
     if (audio) {
       audio.pause();
     }
-    if(selectedOption)return
-    if(permissionState==="denied" && source==="audio") return
-    if(permissionState==="denied" && source==="click") {
-      console.log("object")
-      setErrorMessage("Please allow microphone in browser setting")
-      return
+    if (selectedOption) return;
+    if (permissionState === "denied" && source === "audio") return;
+    if (permissionState === "denied" && source === "click") {
+      console.log("object");
+      setErrorMessage("Please allow microphone in browser setting");
+      return;
     }
     startRecording();
 
@@ -375,7 +372,6 @@ export default function IosQuiz() {
   if (!currentQuestion) {
     return <Loading />;
   }
-
 
   if (hasError) {
     return (
