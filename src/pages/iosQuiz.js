@@ -447,14 +447,14 @@ export default function IosQuiz() {
             />
           </Link>
 
-          <Image
+          {/* <Image
             onClick={toggleQuestionAudio}
             src={isPlaying ? "/images/un-Mute.png" : "/svg/Mute.svg"}
             width={34}
             height={34}
             alt="mute button"
             priority
-          />
+          /> */}
         </div>
       </div>
 
