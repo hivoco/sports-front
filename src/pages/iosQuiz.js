@@ -453,7 +453,7 @@ export default function IosQuiz() {
 
           <Image
             onClick={toggleQuestionAudio}
-            src="/svg/Mute.svg"
+            src={isPlaying ? "/images/un-Mute.png" : "/svg/Mute.svg"}
             width={34}
             height={34}
             alt="mute button"
@@ -486,7 +486,7 @@ export default function IosQuiz() {
           <div className="flex flex-col gap-3 w-full -rotate-3">
             <div className="relative self-center">
               <Image
-                onClick={ ()=>handleStartRecording("click")}
+                onClick={() => handleStartRecording("click")}
                 className={`self-center
                   transition-all duration-300 ease-in-out
                   ${animationNumber >= 1 ? "scale-100" : "scale-75"}
@@ -573,8 +573,6 @@ export default function IosQuiz() {
         >
           Submit
         </button>
-
-        
       </div>
       {isLoading && <VerifyLoading />}
       {errorMessage && (

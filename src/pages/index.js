@@ -79,7 +79,7 @@ const LandingDisplay = () => {
       {/* first screen image full bg */}
 
       <Image
-        className={`absolute  h-full object-cover transition-opacity duration-[1500ms] ease-in-out
+        className={`absolute inset-0  h-full w-full transition-opacity duration-[1500ms] ease-in-out
           ${animationNumber === 1 ? "opacity-100 " : "opacity-0"}
           `}
         src="/images/first-screen-BG.png"

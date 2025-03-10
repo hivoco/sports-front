@@ -41,8 +41,11 @@ const SplashScreen = () => {
 
 
 
+
+
+
     return (
-      <div className="px-6 pt-7 pb-8 flex flex-col justify-between h-full text-white overflow-hidden">
+      <div className="relative z-0 px-6 pt-7 pb-8 flex flex-col justify-between h-full text-white overflow-hidden">
         <div className="flex flex-col gap9 h-[45%] justify-between">
           <div
             className={`transition-all duration-700 ease-in-out
@@ -134,6 +137,18 @@ const SplashScreen = () => {
             </div>
           </button>{" "}
         </div>
+
+        {/* out of flow */}
+        <Image
+          onLoad={(e) => e.currentTarget.classList.add("opacity-50")}
+          className="absolute z-[-1] h-full w-full inset-0 opacity-0 transition-opacity duration-500"
+          src="/animation/ashes.gif"
+          width={375}
+          height={667}
+          alt="ashes animation gif"
+          priority
+        />
+        
       </div>
     );
   };

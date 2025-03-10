@@ -363,14 +363,13 @@ export default function Quiz() {
     <div className="font-Inter pt-7 pb-10 h-full flex flex-col justify-between text-[#28211D] overflow-hidden">
       <div className="px-6 flex justify-between items-start">
         <Link href={"/"}>
-          <nav className="flex gap-2 items-center text-white">
+          <nav className="flex gap-1 items-center text-white">
             <Image
-              className={`transition-all duration-700 ease-in-out
-
-            ${animationNumber >= 1 ? "scale-100" : "scale-125"}
+              className={`transition-all duration-200 ease-in-out
+              ${animationNumber >= 1 ? "scale-100" : "scale-125"}
             `}
               src="/images/s-icon.png"
-              width={24}
+              width={21}
               height={34}
               alt="s icon"
               priority
@@ -420,7 +419,7 @@ export default function Quiz() {
 
           <Image
             onClick={toggleQuestionAudio}
-            src="/svg/Mute.svg"
+            src={isPlaying ? "/images/un-Mute.png" : "/svg/Mute.svg"}
             width={34}
             height={34}
             alt="mute button"
@@ -487,12 +486,12 @@ export default function Quiz() {
                 <button
                   key={index}
                   onClick={() => handleOptionClick(option)}
-                  className={`font-medium text-[16px] leading-5 text-center flex items-center justify-between border border-[#28211D] px-6 py-3 rounded-full capitalize ${
+                  className={`font-medium text-[16px] leading-5 text-center flex items-center justify-between border border-[#28211D]  px-6 py-3 rounded-full capitalize ${
                     selectedOption?.trim().toLowerCase() ===
                     option?.trim().toLowerCase()
                       ? isAnswerCorrect
-                        ? "border-green-500 bg-green-300"
-                        : "bg-[#F60000] text-white"
+                        ? "!border-[#066A37] !bg-[#00AE55] !text-white"
+                        : "!bg-[#F60000] !border-[#7F0000] !text-white"
                       : ""
                   }`}
                 >

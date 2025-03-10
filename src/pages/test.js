@@ -68,57 +68,58 @@ const TermsAndConditions = () => {
         </p>
       </div>
 
-      <div className="absolute bottom-8 flex flex-col gap-3 px-6">
-        <div className="flex flex-col gap-8">
-          <div className="flex flex-col items-center gap-5">
-            <div className="flex flex-col gap-14 justify-center items-center">
-              <div className="flex flex-col gap-6 items-center relative">
-                <h1
-                  style={{
-                    textShadow: "-3.79px 1.89px 3.79px #FFFFFF40",
-                  }}
-                  className={`
+      {/* center section  FCB VS RM */}
+      <div className="flex flex-col gap-5 items-center relative">
+        <h1
+          style={{
+            textShadow: "-3.79px 1.89px 3.79px #FFFFFF40",
+          }}
+          className={`
                   transition-all duration-700 ease-in-out
-                  font-Theo  font-normal text-[44px] leading-11 tracking-[0.1em]
+                  font-Theo  font-normal text-[44px] leading-[1.16]  tracking-[0.1em]
                   flex flex-col items-center
                 ${
                   animationNumber >= 1 ? "translate-x-0" : "-translate-x-[200%]"
                 }
                 `}
-                >
-                  Real Madrid
-                </h1>
+        >
+          Real Madrid
+        </h1>
 
-                <Image
-                  style={{
-                    textShadow: "-6.53px 3.26px 6.53px #FFFFFF40",
-                  }}
-                  className={`absolute 
-                  top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
-                  transition-all duration-700 ease-in-out
-                  ${animationNumber >= 1 ? "scale-100" : "scale-0"}
-                  `}
-                  src={"/svg/& (1).svg"}
-                  width={54}
-                  height={54}
-                  alt="& text"
-                />
+        <Image
+          style={{
+            textShadow: "-6.53px 3.26px 6.53px #FFFFFF40",
+          }}
+          className={`absolute
+            top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 
+            transition-all duration-700 ease-in-out
+            ${animationNumber >= 1 ? "scale-100" : "scale-0"}
+          `}
+          src={"/svg/& (1).svg"}
+          width={59}
+          height={60}
+          alt="& text"
+        />
 
-                <h1
-                  className={`
+        <h1
+          className={`
                     transition-all duration-700 ease-in-out
-                    font-Theo  font-normal text-[44px] leading-11 tracking-[0.1em] 
+                    font-Theo  font-normal text-[44px] leading-[1.16] tracking-[0.1em] 
                              ${
                                animationNumber >= 1
                                  ? "translate-x-0"
                                  : "translate-x-[200%]"
                              }
                     `}
-                >
-                  FC Barcelona
-                </h1>
-              </div>
+        >
+          FC Barcelona
+        </h1>
+      </div>
 
+      <div className="absolute bottom-8 flex flex-col gap-3 px-6">
+        <div className="flex flex-col gap-8">
+          <div className="flex flex-col items-center gap-5">
+            <div className="flex flex-col gap-14 justify-center items-center">
               <p
                 className={`font-Inter font-normal text-[14px] leading-[17px] text-center
                           transition-all duration-700 ease-in-out

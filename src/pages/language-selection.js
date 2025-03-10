@@ -2,15 +2,23 @@ import Button from "@/components/Button";
 import Hexagon from "@/components/Hexagon";
 import NavBar from "@/components/NavBar";
 import Link from "next/link";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const LanguageSelection = () => {
   const [selectedOption, setSelectedOption] = useState("");
-
+  const [animationNumber,setAnimationNumber]=useState(0)
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setAnimationNumber(1);
+    }, 800);
+  }, []);
 
   return (
     <div
       className={`relative pt-7 flex flex-col gap-16 h-full
+      transition-opacity duration-500
+      ${animationNumber === 1 ? "opacity-100" : "opacity-0"}
     `}
     >
       <div className="px-6">
@@ -18,8 +26,6 @@ const LanguageSelection = () => {
       </div>
 
       <div className="px-6 flex flex-col gap-2">
-
-
         <h2 className="font-Theo  font-normal text-[42px] leading-[38px] tracking-[0.02em] text-center text-white">
           Choose Language
         </h2>
@@ -29,7 +35,9 @@ const LanguageSelection = () => {
         </p>
       </div>
 
-      <div className={`absolute top-1/2 -translate-y-1/2  w-full flex flex-col gap-5 justify-center items-center px-7`}>
+      <div
+        className={`absolute top-1/2 -translate-y-1/2  w-full flex flex-col gap-5 justify-center items-center px-7`}
+      >
         <button
           onClick={() => {
             setSelectedOption("english");

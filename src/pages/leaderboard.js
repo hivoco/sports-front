@@ -77,7 +77,7 @@ const Leaderboard = () => {
               style={{
                 textShadow: " -5px 2px 4px  #FFFFFF40",
               }}
-              className=" h-full w-auto absolute  transform left-1/2 -translate-x-1/2"
+              className=" h-full w-auto absolute  transform left-[47%] -translate-x-1/2"
               src="/images/flash.svg"
               width={21}
               height={118}
