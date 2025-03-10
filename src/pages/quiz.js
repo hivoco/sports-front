@@ -35,7 +35,7 @@ export default function Quiz() {
   const [errorMessage, setErrorMessage] = useState("");
   const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   console.log(animationNumber, "animationNumber");
-  const router=useRouter()
+  const router = useRouter();
 
   useEffect(() => {
     const timer1 = setTimeout(() => {
@@ -59,19 +59,19 @@ export default function Quiz() {
     if (router.isReady && !isQuizCompleted) {
       fetchQuestions();
     }
-  }, [router.isReady, language, isQuizCompleted]);
+  }, [router.isReady, language, isQuizCompleted, fetchQuestions]); // Add fetchQuestions here
 
   useEffect(() => {
     if (speechText) {
       verifyAnswer(speechText);
     }
-  }, [speechText]);
+  }, [speechText, verifyAnswer]); // Add verifyAnswer here
 
   useEffect(() => {
     if (allowAudio) {
       playQuestionAudio();
     }
-  }, [currentQuestionIndex]);
+  }, [currentQuestionIndex, allowAudio, playQuestionAudio]); // Add allowAudio and playQuestionAudio here
 
   const toggleQuestionAudio = () => {
     if (isPlaying) {
@@ -153,7 +153,7 @@ export default function Quiz() {
 
   const handleSkip = () => {
     if (isQuizCompleted) return;
-    if(recording) return
+    if (recording) return;
     if (audio) {
       audio.pause();
     }
@@ -174,7 +174,6 @@ export default function Quiz() {
       }
 
       goToNextQuestion();
-  
     }
   };
 
@@ -223,7 +222,7 @@ export default function Quiz() {
   };
 
   const verifyAnswer = async (userAnswer, bool) => {
-    if(!questions[currentQuestionIndex] || isQuizCompleted) return
+    if (!questions[currentQuestionIndex] || isQuizCompleted) return;
     const body = {
       user_answer: userAnswer,
       question_id: questions[currentQuestionIndex].question_id,
@@ -329,9 +328,8 @@ export default function Quiz() {
   const handleStartRecording = async () => {
     if (audio) {
       audio.pause();
-
     }
-    if(selectedOption)return
+    if (selectedOption) return;
     startSpeechRecognition();
   };
 

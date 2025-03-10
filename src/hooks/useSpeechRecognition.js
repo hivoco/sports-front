@@ -59,7 +59,7 @@ const useSpeechRecognition = (onSpeechEnd) => {
       recognitionInstance.removeEventListener("result", handleSpeechResult);
       recognitionInstance.removeEventListener("end", handleSpeechEnd);
     };
-  }, []);
+  }, [handleSpeechEnd]);
 
   return {
     recording,

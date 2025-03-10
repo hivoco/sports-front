@@ -19,7 +19,7 @@ export default function Custom500() {
         <h2 className="text-xl font-bold mb-4">Server Error</h2>
 
         <p className="text-center mb-8">
-          We're sorry, but something went wrong on our server.
+          We&apos;re sorry, but something went wrong on our server.
         </p>
 
         <Link href="/" className="w-full">
