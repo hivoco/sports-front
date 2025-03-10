@@ -19,7 +19,7 @@ export default function Custom404() {
         <h2 className="text-xl font-bold mb-4">Page Not Found</h2>
 
         <p className="text-center mb-8">
-          We couldn't find the page you're looking for.
+          We couldn&apos;t find the page you&apos;re looking for.
         </p>
 
         <Link href="/" className="w-full">
