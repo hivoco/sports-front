@@ -90,7 +90,7 @@ export default function IosQuiz() {
     } catch (err) {
       // Handle error silently without exposing details
       console.error("Processing error");
-      xa;
+   
     }
   };
 
