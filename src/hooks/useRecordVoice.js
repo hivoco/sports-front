@@ -63,7 +63,6 @@
 //   return { recordingAudio, recording, startRecording, stopRecording };
 // };
 
-
 // import { useEffect, useState, useRef } from "react";
 
 // export const useRecordVoice = () => {
@@ -90,7 +89,7 @@
 //         // Silently handle the case where permission was denied
 //         return;
 //       }
-      
+
 //       if (process.env.NODE_ENV !== "production") {
 //         console.log("MediaRecorder not initialized yet.");
 //       }
@@ -151,16 +150,16 @@
 //     }
 //   }, []);
 
-//   return { 
-//     recordingAudio, 
-//     recording, 
-//     startRecording, 
+//   return {
+//     recordingAudio,
+//     recording,
+//     startRecording,
 //     stopRecording,
 //     permissionState  // Expose permission state to the component
 //   };
 // };
 
-
+"use client";
 import { useEffect, useState, useRef } from "react";
 
 export const useRecordVoice = () => {
