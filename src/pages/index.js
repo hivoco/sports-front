@@ -30,16 +30,17 @@ const LandingDisplay = () => {
     };
   }, []);
 
+  
   useEffect(() => {
-    const timer = 
-    setTimeout(() => {
+    if (animationNumber !== 3) return;
+    const timer = setTimeout(() => {
       router.push("/splash-screen");
-    }, 9500);
+    }, 1200);
 
-    return ()=>{
-      clearTimeout(timer)
-    }
-  }, []);
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [animationNumber]);
 
   return (
     <div
@@ -79,10 +80,12 @@ const LandingDisplay = () => {
       {/* first screen image full bg */}
 
       <Image
-        className={`absolute inset-0  h-full w-full transition-opacity duration-[1500ms] ease-in-out
+        className={`absolute inset-0 bg-cover  h-full w-full transition-opacity duration-[1500ms] ease-in-out
           ${animationNumber === 1 ? "opacity-100 " : "opacity-0"}
           `}
         src="/images/first-screen-BG.png"
+
+        // src="/images/Landing pg 16.png"
         width={"375"}
         height={"667"}
         alt="first screen BG"
