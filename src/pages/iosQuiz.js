@@ -481,7 +481,7 @@ export default function IosQuiz() {
 
           <div className="flex flex-col gap-3 w-full -rotate-3">
             <div className="relative self-center">
-              {/* <Image
+              <Image
                 onClick={() => handleStartRecording("click")}
                 className={`self-center
                   transition-all duration-300 ease-in-out
@@ -496,7 +496,7 @@ export default function IosQuiz() {
                 height={134}
                 alt="mic hexagon image"
                 priority
-              /> */}
+              />
 
               {recording && (
                 <Image
